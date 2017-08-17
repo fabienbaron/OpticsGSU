@@ -3,13 +3,21 @@
 ## Julia setup
 
 Install Julia from https://julialang.org/downloads/
+
 Install Pyplot, see here: https://github.com/JuliaPy/PyPlot.jl
+
 Install the Atom editor https://atom.io/.
+
 Install the language-julia Atom package from within Atom.
 
+More advanced users can directly use Juno (a Julia + Atom remix) http://junolab.org/
+
 ## Check that you can use the REPL
-Launch julia
+
+Launch julia from the command line
+
 Check that it can do basic operations, e.g. input ```2+2``` then press enter.
+
 Check that it can plot basic functions using pyplot
 
 ```julia
