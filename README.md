@@ -14,11 +14,11 @@ More advanced users can directly use Juno (a Julia + Atom remix) http://junolab.
 
 ## Check that you can use the REPL
 
-Launch julia from the command line
+1. Launch julia from the command line.
 
-Check that it can do basic operations, e.g. input ```2+2``` then press enter.
+2. Check that it can do basic operations, e.g. input ```2+2``` then press enter.
 
-Check that it can plot basic functions using pyplot
+3. Check that it can plot basic functions using the PyPlot library.
 
 ```julia
 using PyPlot
@@ -28,9 +28,10 @@ plot(x,sin.(x))
 
 ## Learning Julia
 
-These two links should get you started
-https://learnxinyminutes.com/docs/julia/
-https://math.mit.edu/~stevenj/Julia-cheatsheet.pdf
+These two links should get you started:
+1. https://learnxinyminutes.com/docs/julia/
+2. https://math.mit.edu/~stevenj/Julia-cheatsheet.pdf
 
 If you already master Matlab or Python also check https://cheatsheets.quantecon.org/
-For astronomy students, also see http://juliaastro.github.io for useful functions.
+
+Also see http://juliaastro.github.io for useful functions.
