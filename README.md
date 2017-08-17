@@ -30,7 +30,7 @@ plot(x,sin.(x))
 
 These two links should get you started:
 1. https://learnxinyminutes.com/docs/julia/
-2. https://math.mit.edu/~stevenj/Julia-cheatsheet.pdf
+2. https://math.mit.edu/~stevenj/Julia-cheatsheet.pdf (ignore MIT specifics)
 
 If you already master Matlab or Python also check https://cheatsheets.quantecon.org/
 
