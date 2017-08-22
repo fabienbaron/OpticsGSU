@@ -16,6 +16,12 @@ Sum function:
 z=sum(x)
 ```
 
+Complex exponentiation:
+```julia
+z=cis(x)=exp(im*x)
+```
+
+
 Squared modulii of vector values:
 ```julia
 z=abs2.(x)
