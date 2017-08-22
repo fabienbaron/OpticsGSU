@@ -11,6 +11,16 @@ Array pointwise product:
 z=x.*y
 ```
 
+Vector of values from 1 to 512
+```julia
+z=collect(1:512)
+```
+
+Maximum of a vector x
+```julia
+z=maximum(x)
+```
+
 Sum function:
 ```julia
 z=sum(x)
