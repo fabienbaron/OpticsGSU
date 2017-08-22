@@ -1,5 +1,10 @@
-Some functions to know for generating a PSF
-include("zernikes.jl")
-z=zernike(4)
-imview(z)
-'''julia circshift()'''
+
+# Generating a PSF
+
+To use the provided package:
+```julia include("zernikes.jl")```
+
+Array pointwise product: ```julia z=x.*y```
+
+Shifting arrays:
+```julia circshift()```
