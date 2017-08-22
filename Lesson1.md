@@ -23,7 +23,7 @@ z=abs2.(x)
 
 Shifting arrays:
 ```julia
-circshift()
+shifted=circshift(nonshifted, (deltax, deltay))
 ```
 
 Doing the fft and inverse fft:
