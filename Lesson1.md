@@ -18,7 +18,7 @@ z=sum(x)
 
 Complex exponentiation:
 ```julia
-z=cis(x)=exp(im*x)
+z=cis.(x)=exp.(im*x)
 ```
 
 
