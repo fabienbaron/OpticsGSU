@@ -18,13 +18,13 @@ function zernike_rad(n, m, rho)
         return 0
     else
         for k=0:div(n - m,2)
-            output += ((-1)^k * factorial(n - k) / (factorial(k) * factorial(div(n + m,2) - k) * factorial(div(n - m, 2) - k))) * rho.^(n - 2 * k)
+            output += (-1)^k * factorial(n - k) / (factorial(k) * factorial(div(n + m,2) - k) * factorial(div(n - m, 2) - k)) * rho.^(n - 2 * k)
         end
         return output
     end
 end
 
-function zernike_nm(n, m, npix=128, diameter=128, cent_x=64, cent_y=64, outside=0, noll_normalize=true)
+function zernike_nm(n, m, npix=128, diameter=128, cent_x=64.5, cent_y=64.5, outside=0, noll_normalize=true)
 """Return the Zernike polynomial Z[m,n] for a given pupil.
 
     For this function the desired Zernike is specified by 2 indices m and n.
