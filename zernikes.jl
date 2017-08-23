@@ -73,13 +73,13 @@ else
     aperture[find(rho.>1)] = outside  # this is the aperture mask
     norm_coeff=1.0
     if (noll_normalize==true)
-        norm_coeff = 1./(2*(n+1)/(1+(m==0)))^0.5
+        norm_coeff = (2*(n+1)/(1+(m==0)))^0.5
     end
     if (m > 0)
         return norm_coeff*zernike_rad(n, m, rho).*cos.(m * theta).*aperture
     end
     if (m < 0)
-        return norm_coeff*zernike_rad(n, m, rho).*sin.(-m * theta).* aperture
+        return norm_coeff*zernike_rad(n, m, rho).*sin.(-m * theta).*aperture
     end
     return norm_coeff*zernike_rad(n, 0, rho).*aperture
 end
