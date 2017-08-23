@@ -4,7 +4,7 @@
 
 Install Julia from https://julialang.org/downloads/
 
-Install Pyplot by doing ```julia Pkg.add("PyPlot")``` on the Julia command line. Mac users will probably need to have XQuartz installed before. See here for more details: https://github.com/JuliaPy/PyPlot.jl
+Install Pyplot by doing ```Pkg.add("PyPlot")``` on the Julia command line. Mac users will probably need to have XQuartz installed before. See here for more details: https://github.com/JuliaPy/PyPlot.jl
 
 Install the Atom editor https://atom.io/.
 
