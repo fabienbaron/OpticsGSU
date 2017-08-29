@@ -25,8 +25,8 @@ end
 
 
 function stirling(n) # improved stirling formula
-if(n==0)
-     return 1
+if(n<20)
+     return factorial(n)
  else
      return (sqrt(2*pi*n)*(n/e)^n*exp(1/(12*n)-1/(360*n^3)))
 end
@@ -52,11 +52,7 @@ function zernike_rad(n, m, rho)
         return 0
     else
         for k=0:div(n - m,2)
-            if((n>20)|(m>20))
-                output += (-1)^k * stirling(n - k) / (stirling(k) * stirling(div(n + m,2) - k) * stirling(div(n - m, 2) - k)) * rho.^(n - 2 * k)
-            else
-                output += (-1)^k * factorial(n - k) / (factorial(k) * factorial(div(n + m,2) - k) * factorial(div(n - m, 2) - k)) * rho.^(n - 2 * k)
-            end
+            output += (-1)^k * stirling(n - k) / (stirling(k) * stirling(div(n + m,2) - k) * stirling(div(n - m, 2) - k)) * rho.^(n - 2 * k)
         end
         return output
     end
