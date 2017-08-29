@@ -1,9 +1,8 @@
-
 # Generating a PSF
 
 To use the provided package:
 ```julia
-include("zernikes.jl")
+include("optics.jl")
 ```
 
 Array pointwise product:
