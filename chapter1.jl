@@ -7,27 +7,32 @@ pupil_disc = circular_aperture(256, 128, centered=true);
 # Create an annulus pupil
 pupil_annulus = circular_aperture(256, 128, centered=true)-circular_aperture(256, 64, centered=true);
 
-
 # Orthogonality check of disc zernikes
 nz=20;
+npix = 256
 zprod = zeros(nz,nz);
 for i=1:nz
   for j=1:nz
-    Zi = zernike(i, 256, 128, centered=true)
-    Zj = zernike(j, 256, 128, centered=true)
+    Zi = zernike(i, npix, npix, centered=true)
+    Zj = zernike(j, npix, npix, centered=true)
     zprod[i,j]=sum(Zi.*Zj)
   end
 end
 imview(zprod, title="Zernike Orthogonality on Disc")
+#If we want to check deeper, we can go in log plot, but we need to remove tiny <0 values e.g. -1e-12
+zprod=zprod.*(zprod.>0.)
+imview(log.(zprod), title="Zernike Orthogonality on Disc -- Deep check")
 
 # Orthogonality check of annuli zernikes
 nz=20;
+npix=256
+pupil_annulus_2 = circular_aperture(npix, npix, centered=true)-circular_aperture(npix, npix/4, centered=true);
 zprod_ann = zeros(nz,nz);
 for i=1:nz
   for j=1:nz
-    Zi = zernike(i, 256, 128, centered=true)
-    Zj = zernike(j, 256, 128, centered=true)
-    zprod_ann[i,j]=sum(Zi.*Zj.*pupil_annulus)
+    Zi = zernike(i, npix, npix, centered=true)
+    Zj = zernike(j, npix, npix, centered=true)
+    zprod_ann[i,j]=sum(Zi.*Zj.*pupil_annulus_2)
   end
 end
 imview(zprod_ann, title="Zernike Orthogonality on Annulus")
