@@ -97,9 +97,9 @@ rho = sqrt.(xx.^2 + yy.^2)
 theta = atan2.(yy, xx)
 aperture = ones(size(rho))
 aperture[find(rho.>1)] = outside  # this is the aperture mask
-norm_coeff=1.0
+norm_coeff=1.0/(diameter/2)
 if (noll_normalize==true)
-    norm_coeff = (2*(n+1)/(1+(m==0)))^0.5
+    norm_coeff = (2*(n+1)/(1+(m==0)))^0.5/(diameter/2)
 end
 if (m > 0)
     return norm_coeff*zernike_rad(n, m, rho).*cos.(m * theta).*aperture
