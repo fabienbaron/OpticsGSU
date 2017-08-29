@@ -1,5 +1,14 @@
 # High Angular Resolution Imaging ASTR8800
 
+## How to use this repository
+
+First clone the repository
+```
+git clone https://github.com/fabienbaron/opticscourse.git
+```
+
+To update it during the semester: ```git pull```
+
 ## Julia setup
 
 Install Julia from https://julialang.org/downloads/
