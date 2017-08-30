@@ -91,10 +91,43 @@ pupil=aperture.*cis.(phase);
 psf=abs2.(ifft(pupil)*npix); #the npix factor is for the normalization of the fft
 psf = circshift(psf,(npix/2,npix/2)); # fft is centered on [1,1], but we want it on npix/2,npix/2
 sum(psf) # should be == 1  !
-imview(psf) #view psf from the top
+imview(psf, zoom=32, color="Greys") #view psf from the top
 plot(collect(1:npix), psf[div(npix,2),:]); #plot a slice
 
-# maximum(psf) -> gives us the maximum
+## Aberrations
+##
+
+# Visualize the first 16 Zernikes one by one
+npix=512;
+aperture = circular_aperture(npix, npix/16, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
+aperture = aperture/sqrt(sum(aperture.^2));  # pupil normalization
+fig = figure("PSF affected by single Zernike mode",figsize=(12,12))
+maxpsfzero=1
+strehl = 1
+for i=1:16
+  phase= 20.*zernike(i, npix, npix/16, centered=true);
+  pupil=aperture.*cis.(phase);
+  psf=abs2.(ifft(pupil)*npix); #the npix factor is for the normalization of the fft
+  psf = circshift(psf,(npix/2,npix/2)); # fft is centered on [1,1], but we want it on npix/2,npix/2
+  if i==1
+    strehl = 1
+    maxpsfzero = maximum(psf)
+  else
+    strehl = maximum(psf)/maxpsfzero
+  end
+
+  ax=fig[:add_subplot](4,4,i)
+  ax[:axes][:get_xaxis]()[:set_ticks]([]);
+  ax[:axes][:get_yaxis]()[:set_ticks]([]);
+  imview_add(psf, zoom=4, color="Greys")
+  title("Zernike $i")
+  println("Noll: ", i, " Flux : ", sum(psf), " Strehl: ", strehl)
+end
+
+
+
+
+
 
 # OTF
 otf = circshift(fft(psf), (npix/2,npix/2)); #fft result always need to be shifted
