@@ -82,9 +82,9 @@ end
 imview(aperture, title="Golay-6")
 
 # Making a PSF
-npix=256;
-aperture = circular_aperture(npix, npix/2, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
-aperture = aperture/sqrt(sum(aperture.^2))  # pupil normalization
+npix=4096;
+aperture = circular_aperture(npix, npix/16, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
+aperture = aperture/sqrt(sum(aperture.^2));  # pupil normalization
 #phase= zernike(4, npix, npix/2, centered=true);
 phase = 0
 pupil=aperture.*cis.(phase);
