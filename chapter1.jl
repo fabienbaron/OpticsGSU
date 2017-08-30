@@ -19,8 +19,8 @@ for i=1:nz
   end
 end
 imview(zprod, title="Zernike Orthogonality on Disc")
-#If we want to check deeper, we can go in log plot, but we need to remove tiny <0 values e.g. -1e-12
-zprod=zprod.*(abs(zprod).>1e-12)
+#If we want to check deeper, we can go in log plot, but we need to remove tiny <0 values
+zprod=abs.(zprod)
 imview(log.(zprod), title="Zernike Orthogonality on Disc -- Deep check")
 
 # Orthogonality check of annuli zernikes
