@@ -82,16 +82,17 @@ end
 imview(aperture, title="Golay-6")
 
 # Making a PSF
-npix=4096;
+npix=1024;
 aperture = circular_aperture(npix, npix/16, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
 aperture = aperture/sqrt(sum(aperture.^2));  # pupil normalization
 #phase= zernike(4, npix, npix/2, centered=true);
 phase = 0
 pupil=aperture.*cis.(phase);
 psf=abs2.(ifft(pupil)*npix); #the npix factor is for the normalization of the fft
-psf = circshift(psf,(npix/2,npix/2)); # fft is centered on [1,1], but we want it on npix/2,npix/2
+psf = fftshift(psf); # fft is centered on [1,1], but we want it on npix/2,npix/2
 sum(psf) # should be == 1  !
-imview(psf, zoom=32, color="Greys") #view psf from the top
+imview(psf, zoom=8, color="Greys") #view psf from the top
+clf()
 plot(collect(1:npix), psf[div(npix,2),:]); #plot a slice
 
 ## Aberrations
@@ -108,7 +109,7 @@ for i=1:16
   phase= 20.*zernike(i, npix, npix/16, centered=true);
   pupil=aperture.*cis.(phase);
   psf=abs2.(ifft(pupil)*npix); #the npix factor is for the normalization of the fft
-  psf = circshift(psf,(npix/2,npix/2)); # fft is centered on [1,1], but we want it on npix/2,npix/2
+  psf = fftshift(psf); # fft is centered on [1,1], but we want it on npix/2,npix/2
   if i==1
     strehl = 1
     maxpsfzero = maximum(psf)
@@ -125,11 +126,7 @@ for i=1:16
 end
 
 
-
-
-
-
 # OTF
-otf = circshift(fft(psf), (npix/2,npix/2)); #fft result always need to be shifted
+otf = fftshift(fft(psf)); #fft result always need to be shifted
 mtf = abs.(otf);
 imsurf(mtf) #3d view of the mtf

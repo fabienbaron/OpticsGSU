@@ -1,6 +1,6 @@
 using PyPlot
 
-function imview(x;title="",zoom=1, color="coolwarm")
+function imview(x;title="",zoom=1, color="gray")
     if zoom < 1
         zoom = 1
     end
@@ -33,11 +33,11 @@ function imsurf(z; title="", zoom=1, color="coolwarm")
     zoomed[isnan.(zoomed)]=0
     x = collect(1:size(zoomed,1))
     y = collect(1:size(zoomed,2))
-    surf(x,y,zoomed, facecolors=get_cmap(color)(zoomed/maximum(zoomed)), linewidth=0.25, rstride=1, edgecolors="k", cstride=1,antialiased=false, shade=false)
+    surf(x,y,zoomed, facecolors=get_cmap(color)(zoomed/maximum(zoomed)), linewidth=0.25, rstride=4, edgecolors="k", cstride=4,antialiased=false, shade=false)
     tight_layout()
 end
 
-function imview_add(x;zoom=1, color="coolwarm") #will overplot whatever you're drawing
+function imview_add(x;zoom=1, color="gray") #will overplot whatever you're drawing
     if zoom < 1
         zoom = 1
     end
