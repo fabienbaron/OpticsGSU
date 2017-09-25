@@ -1,4 +1,4 @@
-if Pkg.installed("Images.jl") == nothing
+if Pkg.installed("Images") == nothing
            println("Please install the Images package using Pkg.add(\"Images\")\n");
 end
 
