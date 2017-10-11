@@ -84,7 +84,7 @@ imview(aperture, title="Golay-6")
 # Making a PSF
 npix=1024;
 aperture = circular_aperture(npix, npix/16, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
-aperture = aperture/sqrt(sum(aperture.^2));  # pupil normalization
+aperture = aperture/norm(aperture);  # pupil normalization
 #phase= zernike(4, npix, npix/2, centered=true);
 phase = 0
 pupil=aperture.*cis.(phase);
@@ -101,7 +101,7 @@ plot(collect(1:npix), psf[div(npix,2),:]); #plot a slice
 # Visualize the first 16 Zernikes one by one
 npix=512;
 aperture = circular_aperture(npix, npix/16, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
-aperture = aperture/sqrt(sum(aperture.^2));  # pupil normalization
+aperture = aperture/norm(aperture);  # pupil normalization
 fig = figure("PSF affected by single Zernike mode",figsize=(12,12))
 maxpsfzero=1
 strehl = 1
@@ -124,7 +124,6 @@ for i=1:16
   title("Zernike $i")
   println("Noll: ", i, " Flux : ", sum(psf), " Strehl: ", strehl)
 end
-
 
 # OTF
 otf = fftshift(fft(psf)); #fft result always need to be shifted
