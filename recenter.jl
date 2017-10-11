@@ -8,7 +8,7 @@ pos = ind2sub(size(x),indmax(x))
 return [pos[1],pos[2]]
 end
 
-function recenter(x, newcenter) #note: this takes a 2D array
-Δ=[(size(x,1)+1)/2, (size(x,2)+1)/2]-newcenter
+function recenter(x, center) #note: this takes a 2D array
+Δ=[(size(x,1)+1)/2, (size(x,2)+1)/2]-center
 return circshift(x,round.(Δ))
 end

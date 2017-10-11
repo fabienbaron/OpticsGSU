@@ -1,13 +1,9 @@
 include("optics.jl");
 obj=read(FITS("jupiter.fits")[1])*1.0
 npix=size(obj,1)
-
 # Exercice 1 : create Gaussian PSF with sigma=5 pixels
 psf_gaussian=gaussian2d(npix,npix,5)
 image = conv_psf_obj(psf_gaussian, obj);
-
-
-
 
 # Exercice 2: Read phase screen
 phase=read((FITS("Dr03_phases.fits")[1]));  # turbulence
