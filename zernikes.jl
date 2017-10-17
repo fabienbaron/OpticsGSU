@@ -58,7 +58,7 @@ function zernike_rad(n, m, rho)
     end
 end
 
-function zernike(j, npix=128, diameter=128, cent_x=64.5, cent_y=64.5; outside=0, noll_normalize=true, centered=false)
+function zernike(j, npix=128, diameter=128; cent_x=-1, cent_y=-1, outside=0, noll_normalize=true, centered=false)
   """Return the Zernike polynomial Z[j] for a given pupil.
   For this function the desired Zernike is specified by the Noll index j.
   See zernike_nm for an equivalent function in which the polynomials are ordered by n,m
@@ -83,7 +83,7 @@ function zernike(j, npix=128, diameter=128, cent_x=64.5, cent_y=64.5; outside=0,
           -------
           zern : 2D array Z[j] evaluated at each (rho, theta)
   """
-if centered == true
+if (centered == true)|(cent_x==-1)|(cent_y==-1)
   cent_x = (npix+1)/2
   cent_y = (npix+1)/2
 end
