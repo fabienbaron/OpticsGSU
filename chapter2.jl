@@ -1,6 +1,6 @@
 using OptimPack
 include("optics.jl")
-obj = read(FITS("../opticscourse/jupiter.fits")[1])*1.;
+obj = read(FITS("jupiter.fits")[1])*1.;
 # Generate data
 x_true = zeros(256,256); x_true[190:200,190:200]=1.0;
 npix = size(obj,1);
@@ -14,7 +14,7 @@ x_noisy = x_conv + σ.*randn(size(obj));
 function epsilon(model, g, data, σ, psf)
     res = (data - convolve(model,psf))/σ;
     f= sum(res.^2);
-    g[:,:] = -2/σ*correlate(res,psf);
+    g[:] = -2/σ*correlate(res,psf);
     return f;
 end
 
