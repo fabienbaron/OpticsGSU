@@ -50,3 +50,21 @@ function imview_add(x;zoom=1, color="gray") #will overplot whatever you're drawi
     imshow(x[center_x-zoom_span_x+1:center_x+zoom_span_x, center_y-zoom_span_y+1:center_y+zoom_span_y], cmap=ColorMap(color), interpolation="none");
     tight_layout()
 end
+
+function imview4(x1,x2,x3,x4;color="gray")
+im = figure("Reconstruction",figsize=(16,4))
+clf();
+subplot(1,4,1);
+imshow(x1, interpolation="none",  cmap=ColorMap(color))
+xlabel("Object");
+subplot(1,4,2);
+imshow(x2, interpolation="none",  cmap=ColorMap(color))
+xlabel("Data");
+subplot(1,4,3);
+imshow(x3, interpolation="none",  cmap=ColorMap(color))
+xlabel("Reconstructed");
+subplot(1,4,4);
+imshow(x4, interpolation="none",  cmap=ColorMap(color))
+xlabel("Convolved reconstruction");
+tight_layout();
+end
