@@ -2,6 +2,13 @@ function conv_psf_obj(psf::Array{Float64,2}, object::Array{Float64,2})
 return real(fftshift(ifft(fft(object).*fft(psf))));
 end
 
+function convolve(a::Array{Float64,2}, b::Array{Float64,2})
+return real(fftshift(ifft(fft(a).*fft(b))));
+end
+
+function correlate(a::Array{Float64,2}, b::Array{Float64,2})
+return real(fftshift(ifft(fft(a).*conj(fft(b)))));
+end
 
 function pupil_to_psf(pup_amplitude, pup_phase)
     pupil= pup_amplitude.*cis.(pup_phase)
