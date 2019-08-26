@@ -29,7 +29,8 @@ All the details are here if you need: https://github.com/JuliaPy/PyPlot.jl but h
 Mac users will need to have XQuartz installed first.
 Then there are three possible paths:
 
-Path 1: you've already got your own python installation and want to use it for this course, go to julia and type ```ENV["PYTHON"]="/pathto/python"``` where ```pathto``` is your actual path (check with ```which python``` from terminal) !
+Path 1: you've already got your own python installation and want to use it for this course, go to julia and type ```ENV["PYTHON"]="/pathto/python"``` where ```pathto``` is your actual path (check with ```which python``` from terminal).
+
 
 Path 2: you don't have a python installation  and just want the default Julia on, go to Julia and type ```ENV["PYTHON"]=""```
 
@@ -42,6 +43,7 @@ export PYTHONPATH="/usr/local/lib/python2.7:$PYTHONPATH"
 pip install numpy scipy matplotlib
 ```
 Then edit your ~/.profile to add the two export lines.
+Create a file called ```~/.config/matplotlibrc``` with one line ```backend: Qt5Agg```.
 Then go to Julia and type ```ENV["PYTHON"]="/usr/local/bin/python"```.
 
 After any of these paths, go to the package manager ```]``` and type ```add PyCall```, then ```add PyPlot```.
