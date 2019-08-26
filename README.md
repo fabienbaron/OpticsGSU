@@ -15,11 +15,11 @@ This is a reminder that you can use the Julia's package manager to update this p
 
 Install the latest Julia from https://julialang.org/downloads/
 
-Install Pyplot library from the Julia command line. Mac users will probably need to have XQuartz installed before. See here for more details: https://github.com/JuliaPy/PyPlot.jl
+Install Pyplot library from the Julia command line. Mac users will probably need to have XQuartz installed before. See here for more details: https://github.com/JuliaPy/PyPlot.jl. You will need to type ```ENV["PYTHON"]=""```, then ```]```, then ```add PyPlot```.
 
 Install the Atom editor https://atom.io/.
 
-Install the language-julia Atom package from within Atom: this enables syntax highlighting of Julia code.
+Install the language-julia Atom package from within the Settings/Preferences of Atom, Install tab: this enables syntax highlighting of Julia code.
 
 Install the latex-completions Atom package from within Atom: this enables the autocompletion of LaTeX symbols (α, β, ...)
 
