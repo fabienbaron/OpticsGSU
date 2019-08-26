@@ -2,7 +2,7 @@
 
 To use the provided package:
 ```julia
-include("optics.jl")
+using OpticsGSU
 ```
 
 Array pointwise product:
