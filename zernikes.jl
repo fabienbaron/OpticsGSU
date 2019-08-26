@@ -1,5 +1,5 @@
 
-function noll_indices(j)
+function noll_indexes(j)
     """Convert from 1-D to 2-D indexing for Zernikes or Hexikes.
 
     Parameters
@@ -58,7 +58,7 @@ function zernike_rad(n, m, rho)
     end
 end
 
-function zernike(j, npix=128, diameter=128; cent_x=-1, cent_y=-1, outside=0, noll_normalize=true, centered=false)
+function zernike(j; npix::Int64=128, diameter::Int64=128, cent_x::Float64=-1.0, cent_y::Float64=-1.0, outside::Float64=0.0, noll_normalize::Bool=true, centered::Bool=false)
   """Return the Zernike polynomial Z[j] for a given pupil.
   For this function the desired Zernike is specified by the Noll index j.
   See zernike_nm for an equivalent function in which the polynomials are ordered by n,m
@@ -83,20 +83,20 @@ function zernike(j, npix=128, diameter=128; cent_x=-1, cent_y=-1, outside=0, nol
           -------
           zern : 2D array Z[j] evaluated at each (rho, theta)
   """
-if (centered == true)|(cent_x==-1)|(cent_y==-1)
+if (centered == true)|(cent_x==-1.0)|(cent_y==-1.0)
   cent_x = (npix+1)/2
   cent_y = (npix+1)/2
 end
 
-n, m = noll_indices(j);
-x = (collect(linspace(1,npix,npix)) - cent_x) / (diameter / 2.)
-y = (collect(linspace(1,npix,npix)) - cent_y) / (diameter / 2.)
-xx = repmat(x,1,npix)
-yy = repmat(y,1,npix)'
+n, m = noll_indexes(j);
+x = (collect(1:npix) .- cent_x) / (diameter / 2.)
+y = (collect(1:npix) .- cent_y) / (diameter / 2.)
+xx = repeat(x,1,npix)
+yy = repeat(y,1,npix)'
 rho = sqrt.(xx.^2 + yy.^2)
-theta = atan2.(yy, xx)
+theta = atan.(yy, xx)
 aperture = ones(size(rho))
-aperture[find(rho.>1)] = outside  # this is the aperture mask
+aperture[findall(rho.>1)] .= outside  # this is the aperture mask
 norm_coeff=1.0/(diameter/2)
 if (noll_normalize==true)
     norm_coeff = (2*(n+1)/(1+(m==0)))^0.5/(diameter/2)
@@ -111,7 +111,7 @@ end
 return norm_coeff*zernike_rad(n, 0, rho).*aperture
 end
 
-function circular_aperture(npix=128, diameter=128, cent_x=64.5, cent_y=64.5; outside=0, centered = false)
+function circular_aperture(;npix::Int64=128, diameter::Int64=128, cent_x::Float64=64.5, cent_y::Float64=64.5, outside::Float64=0.0, centered::Bool = false)
   """
   Returns a 2D aperture of the desired diameter pixels, centered on (cent_x,cent_y) and on support npix X npix
   """
@@ -120,12 +120,12 @@ if centered == true
   cent_y = (npix+1)/2
 end
 
-x = (collect(linspace(1,npix,npix)) - cent_x) / (diameter / 2.)
-y = (collect(linspace(1,npix,npix)) - cent_y) / (diameter / 2.)
-xx = repmat(x,1,npix)
-yy = repmat(y,1,npix)'
+x = (collect(1:npix) .- cent_x) / (diameter / 2.)
+y = (collect(1:npix) .- cent_y) / (diameter / 2.)
+xx = repeat(x,1,npix)
+yy = repeat(y,1,npix)'
 rho = sqrt.(xx.^2 + yy.^2)
 aperture = ones(size(rho))
-aperture[find(rho.>1)] = outside  # this is the aperture mask
+aperture[findall(rho.>1)] .= outside  # this is the aperture mask
 return aperture
 end

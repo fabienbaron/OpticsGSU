@@ -1,5 +1,4 @@
-include("optics.jl");
-
+using OpticsGSU;
 #Create a disc pupil
 # Because of the Fourier transform later on, we would like it to be in a double-sized support
 pupil_disc = circular_aperture(256, 128, centered=true);

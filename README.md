@@ -11,15 +11,15 @@ To update it during the semester: ```git pull```
 
 ## Julia setup
 
-Install Julia from https://julialang.org/downloads/
+Install the latest Julia from https://julialang.org/downloads/
 
-Install Pyplot by doing ```Pkg.add("PyPlot")``` on the Julia command line. Mac users will probably need to have XQuartz installed before. See here for more details: https://github.com/JuliaPy/PyPlot.jl
+Install Pyplot library from the Julia command line. Mac users will probably need to have XQuartz installed before. See here for more details: https://github.com/JuliaPy/PyPlot.jl
 
 Install the Atom editor https://atom.io/.
 
-Install the language-julia Atom package from within Atom (Linux: CTRL+comma then Install tab, Mac:COMMAND+comma then Install tab).
+Install the language-julia Atom package from within Atom: this enables syntax highlighting of Julia code.
 
-More advanced users can directly use Juno (a Julia + Atom remix) http://junolab.org/
+Install the latex-completions Atom package from within Atom: this enables the autocompletion of LaTeX symbols (α, β, ...)
 
 ## Check that you can use the REPL
 
@@ -31,15 +31,16 @@ More advanced users can directly use Juno (a Julia + Atom remix) http://junolab.
 
 ```julia
 using PyPlot
-x=linspace(-pi, pi, 100)
+x=range(-pi, pi, length=100)
 plot(x,sin.(x))
+grid()
 ```
 
 ## Learning Julia
 
 These two links should get you started:
 1. https://learnxinyminutes.com/docs/julia/
-2. https://math.mit.edu/~stevenj/Julia-cheatsheet.pdf (ignore MIT specifics)
+2. https://www.sas.upenn.edu/~jesusfv/Chapter_HPC_8_Julia.pdf
 
 If you already master Matlab or Python also check https://cheatsheets.quantecon.org/
 

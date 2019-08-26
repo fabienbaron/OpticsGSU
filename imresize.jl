@@ -1,7 +1,3 @@
-if Pkg.installed("Images") == nothing
-           println("Please install the Images package using Pkg.add(\"Images\")\n");
-end
-
 using Images
 using FITSIO
 using PyPlot
@@ -21,6 +17,4 @@ image=read(FITS("saturn.fits")[1])
 imshow(image)
 clf();
 imshow(imscale(image,0.5))
-
-
 end
