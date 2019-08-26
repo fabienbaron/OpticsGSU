@@ -38,7 +38,7 @@ imview(zprod_ann, title="Zernike Orthogonality on Annulus")
 
 #Decomposition of a phase into Zernikes
 using FITSIO
-phase=read((FITS("atmosphere_d_r0_10.fits"))[1]);
+phase=read((FITS("./data/atmosphere_d_r0_10.fits"))[1]);
 imview(phase,title="Original phase");
 npix_phase = (size(phase))[1]
 nz = 50; #let's decompose into 20 modes

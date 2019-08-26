@@ -3,7 +3,7 @@
 ## Installation
 
 From Julia's command line, press ```]``` to access the package manager.
-Add the package for this course: ```add https://github.com/fabienbaron/opticscourse```
+Add the package for this course: ```add https://github.com/fabienbaron/OpticsGSU```
 Exit the package manager, and do: ```using OpticsGSU```.
 
 ## Updates
