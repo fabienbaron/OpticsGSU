@@ -1,13 +1,15 @@
 # High Angular Resolution Imaging ASTR8800
 
-## How to use this repository
+## Installation
 
-First clone the repository
-```
-git clone https://github.com/fabienbaron/opticscourse.git
-```
+From Julia's command line, press ```]``` to access the package manager.
+Add the package for this course: ```add https://github.com/fabienbaron/opticscourse```
+Exit the package manager, and do: ```using OpticsGSU```.
 
-To update it during the semester: ```git pull```
+## Updates
+This is a reminder that you can use the Julia's package manager to update this package: ```update OpticsGSU```.
+
+## Prerequisites
 
 ## Julia setup
 
