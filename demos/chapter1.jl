@@ -42,7 +42,7 @@ using FITSIO
 phase=read((FITS("./data/atmosphere_d_r0_10.fits"))[1]);
 imview(phase,title="Original phase");
 npix_phase = (size(phase))[1]
-nz = 50; #let's decompose into 20 modes
+nz = 50; #let's decompose into 50 modes
 a = zeros(nz); # here is the array to store the decomposition factors
 for i=1:nz
     Zi = zernike(i, npix=npix_phase, diameter=npix_phase, centered=true)
@@ -82,9 +82,11 @@ end
 imview(aperture, title="Golay-6")
 
 # Making a PSF
+using LinearAlgebra
+using FFTW
 npix=1024;
-aperture = circular_aperture(npix=npix, diameter=npix/16, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
-aperture = aperture/norm(aperture);  # pupil normalization
+aperture = circular_aperture(npix=npix, diameter=32, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
+aperture = aperture./norm(aperture);  # pupil normalization
 #phase= zernike(4, npix, npix/2, centered=true);
 phase = 0
 pupil=aperture.*cis.(phase);
@@ -100,27 +102,26 @@ plot(collect(1:npix), psf[div(npix,2),:]); #plot a slice
 
 # Visualize the first 16 Zernikes one by one
 npix=512;
-aperture = circular_aperture(npix=npix, diameter=npix/16, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
+aperture = circular_aperture(npix=npix, diameter=64, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
 aperture = aperture/norm(aperture);  # pupil normalization
 fig = figure("PSF affected by single Zernike mode",figsize=(12,12))
 maxpsfzero=1
 strehl = 1
 for i=1:16
-  phase= 20.*zernike(i, npix, npix/16, centered=true);
+  phase= 20.0*zernike(i, npix=npix, diameter=64, centered=true);
   pupil=aperture.*cis.(phase);
   psf=abs2.(ifft(pupil)*npix); #the npix factor is for the normalization of the fft
   psf = fftshift(psf); # fft is centered on [1,1], but we want it on npix/2,npix/2
   if i==1
-    strehl = 1
-    maxpsfzero = maximum(psf)
+    global strehl = 1
+    global maxpsfzero = maximum(psf)
   else
-    strehl = maximum(psf)/maxpsfzero
+    global strehl = maximum(psf)/maxpsfzero
   end
-
-  ax=fig[:add_subplot](4,4,i)
-  ax[:axes][:get_xaxis]()[:set_ticks]([]);
-  ax[:axes][:get_yaxis]()[:set_ticks]([]);
-  imview_add(psf, zoom=4, color="Greys")
+  ax=fig.add_subplot(4,4,i)
+  #ax.axes.get_xaxis.set_ticks([]);
+  #ax.axes.get_yaxis.set_ticks([]);
+  imview_add(psf.^.8, zoom=4, color="Greys")
   title("Zernike $i")
   println("Noll: ", i, " Flux : ", sum(psf), " Strehl: ", strehl)
 end
