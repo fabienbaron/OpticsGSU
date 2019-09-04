@@ -1,10 +1,10 @@
 using OpticsGSU;
 #Create a disc pupil
 # Because of the Fourier transform later on, we would like it to be in a double-sized support
-pupil_disc = circular_aperture(256, 128, centered=true);
+pupil_disc = circular_aperture(npix=256, diameter=128, centered=true);
 
 # Create an annulus pupil
-pupil_annulus = circular_aperture(256, 128, centered=true)-circular_aperture(256, 64, centered=true);
+pupil_annulus = circular_aperture(npix=256, diameter=128, centered=true)-circular_aperture(256, 64, centered=true);
 
 # Orthogonality check of disc zernikes
 nz=20;
@@ -12,8 +12,8 @@ npix = 256
 zprod = zeros(nz,nz);
 for i=1:nz
   for j=1:nz
-    Zi = zernike(i, npix, npix, centered=true)
-    Zj = zernike(j, npix, npix, centered=true)
+    Zi = zernike(i, npix=npix, diameter=npix, centered=true)
+    Zj = zernike(j, npix=npix, diameter=npix, centered=true)
     zprod[i,j]=sum(Zi.*Zj)
   end
 end
@@ -25,12 +25,12 @@ imview(log.(zprod), title="Zernike Orthogonality on Disc -- Deep check")
 # Orthogonality check of annuli zernikes
 nz=20;
 npix=256
-pupil_annulus_2 = circular_aperture(npix, npix, centered=true)-circular_aperture(npix, npix/4, centered=true);
+pupil_annulus_2 = circular_aperture(npix=npix, diameter=npix, centered=true)-circular_aperture(npix, npix/4, centered=true);
 zprod_ann = zeros(nz,nz);
 for i=1:nz
   for j=1:nz
-    Zi = zernike(i, npix, npix, centered=true)
-    Zj = zernike(j, npix, npix, centered=true)
+    Zi = zernike(i, npix=npix, diameter=npix, centered=true)
+    Zj = zernike(j, npix=npix, diameter=npix, centered=true)
     zprod_ann[i,j]=sum(Zi.*Zj.*pupil_annulus_2)
   end
 end
@@ -82,7 +82,7 @@ imview(aperture, title="Golay-6")
 
 # Making a PSF
 npix=1024;
-aperture = circular_aperture(npix, npix/16, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
+aperture = circular_aperture(npix=npix, diameter=npix/16, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
 aperture = aperture/norm(aperture);  # pupil normalization
 #phase= zernike(4, npix, npix/2, centered=true);
 phase = 0
@@ -99,7 +99,7 @@ plot(collect(1:npix), psf[div(npix,2),:]); #plot a slice
 
 # Visualize the first 16 Zernikes one by one
 npix=512;
-aperture = circular_aperture(npix, npix/16, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
+aperture = circular_aperture(npix=npix, diameter=npix/16, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
 aperture = aperture/norm(aperture);  # pupil normalization
 fig = figure("PSF affected by single Zernike mode",figsize=(12,12))
 maxpsfzero=1
