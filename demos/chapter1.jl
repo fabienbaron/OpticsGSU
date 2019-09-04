@@ -44,13 +44,13 @@ npix_phase = (size(phase))[1]
 nz = 50; #let's decompose into 20 modes
 a = zeros(nz); # here is the array to store the decomposition factors
 for i=1:nz
-    Zi = zernike(i, npix_phase, npix_phase, centered=true)
+    Zi = zernike(i, npix=npix_phase, diameter=npix_phase, centered=true)
     a[i]=sum(Zi.*phase)
 end
 println("Decomposition coefficients: ", a);
 recomposed_phase = zeros(size(phase)) # array of zeros of the same size as the original phase
 for i=1:nz
-   recomposed_phase += a[i]*zernike(i, npix_phase, npix_phase, centered=true)
+   global recomposed_phase += a[i]*zernike(i, npix=npix_phase, diameter=npix_phase, centered=true)
 end
 imview(recomposed_phase,title="Recomposed phase");
 
