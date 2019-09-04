@@ -4,7 +4,7 @@ using OpticsGSU;
 pupil_disc = circular_aperture(npix=256, diameter=128, centered=true);
 
 # Create an annulus pupil
-pupil_annulus = circular_aperture(npix=256, diameter=128, centered=true)-circular_aperture(256, 64, centered=true);
+pupil_annulus = circular_aperture(npix=256, diameter=128, centered=true)-circular_aperture(npix=256, diameter=64, centered=true);
 
 # Orthogonality check of disc zernikes
 nz=20;
@@ -25,7 +25,7 @@ imview(log.(zprod), title="Zernike Orthogonality on Disc -- Deep check")
 # Orthogonality check of annuli zernikes
 nz=20;
 npix=256
-pupil_annulus_2 = circular_aperture(npix=npix, diameter=npix, centered=true)-circular_aperture(npix, npix/4, centered=true);
+pupil_annulus_2 = circular_aperture(npix=npix, diameter=npix, centered=true)-circular_aperture(npix=npix, diameter=npix/4, centered=true);
 zprod_ann = zeros(nz,nz);
 for i=1:nz
   for j=1:nz
