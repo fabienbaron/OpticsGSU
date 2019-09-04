@@ -65,7 +65,7 @@ centers_y = [-sqrt(3)/6,-sqrt(3)/6,sqrt(3)/3]*npix/4
 diam = 64 #sub-aperture diameter
 aperture = zeros(npix,npix)
 for i=1:length(centers_x)
- aperture += circular_aperture(npix, diam, (npix+1)/2+centers_x[i], (npix+1)/2+centers_y[i])
+ global aperture += circular_aperture(npix=npix, diameter=diam, cent_x =(npix+1)/2+centers_x[i], cent_y = (npix+1)/2+centers_y[i])
 end
 imview(aperture, title="Golay-3")
 
@@ -76,7 +76,7 @@ centers_y=[2,-1,-4,-4,2,5]*sqrt(3)/6*npix/4
 diam = 64 #sub-aperture diameter
 aperture = zeros(npix,npix)
 for i=1:length(centers_x)
- aperture += circular_aperture(npix, diam, (npix+1)/2+centers_x[i], (npix+1)/2+centers_y[i])
+ global aperture += circular_aperture(npix=npix, diameter=diam, cent_x = (npix+1)/2+centers_x[i], cent_y = (npix+1)/2+centers_y[i])
 end
 imview(aperture, title="Golay-6")
 
