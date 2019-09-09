@@ -1,4 +1,9 @@
 using OpticsGSU;
+using PyPlot
+using FITSIO
+using FFTW
+using LinearAlgebra
+
 #Create a disc pupil
 # Because of the Fourier transform later on, we would like it to be in a double-sized support
 pupil_disc = circular_aperture(npix=256, diameter=128, centered=true);
@@ -37,8 +42,7 @@ end
 imview(zprod_ann, title="Zernike Orthogonality on Annulus")
 
 #Decomposition of a phase into Zernikes
-using FITSIO
-phase=read((FITS("./data/atmosphere_d_r0_10.fits"))[1]);
+phase=readfits("./data/atmosphere_d_r0_10.fits");
 imview(phase,title="Original phase");
 npix_phase = (size(phase))[1]
 nz = 50; #let's decompose into 50 modes
@@ -81,8 +85,7 @@ end
 imview(aperture, title="Golay-6")
 
 # Making a PSF
-using LinearAlgebra
-using FFTW
+
 npix=1024;
 aperture = circular_aperture(npix=npix, diameter=32, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
 aperture = aperture./norm(aperture);  # pupil normalization

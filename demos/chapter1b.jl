@@ -1,16 +1,19 @@
 using OpticsGSU
-obj=read(FITS("jupiter.fits")[1])*1.0
+using FITSIO
+
+obj=readfits("./data/jupiter.fits")*1.0
 npix=size(obj,1)
 # Exercice 1 : create Gaussian PSF with sigma=5 pixels
 psf_gaussian=gaussian2d(npix,npix,5)
 image = conv_psf_obj(psf_gaussian, obj);
+imview(image, title="Image");
 
 # Exercice 2: Read phase screen
-phase=read((FITS("Dr03_phases.fits")[1]));  # turbulence
+phase=readfits("./data/Dr03_phases.fits");  # turbulence
 aperture=circular_aperture(npix=npix,diameter=npix/2,centered=true);
 
-wiener_numer = zeros(Complex64,npix,npix);
-wiener_denom = zeros(Complex64,npix,npix);
+wiener_numer = zeros(Complex{Float64},npix,npix);
+wiener_denom = zeros(Complex{Float64},npix,npix);
 npad = div(max(npix-size(phase,1),0),2); # we may need to pad the phase screen
 
 

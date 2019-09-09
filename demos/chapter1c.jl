@@ -41,7 +41,7 @@ for j = 1:jlim
 end
 
 #Output fits image of corrected phases
-f=FITS("corrected.fits","w"); write(f,phase); close(f);
+writefits(phase, "corrected.fits");
 
 #Output D/r0 value in section
 println("D/r0 over pupil: ",dr0);
