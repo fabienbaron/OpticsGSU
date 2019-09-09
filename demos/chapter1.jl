@@ -1,5 +1,5 @@
-include("../src/OpticsGSU.jl")
-using Main.OpticsGSU;
+using OpticsGSU;
+using PyPlot
 #Create a disc pupil
 # Because of the Fourier transform later on, we would like it to be in a double-sized support
 pupil_disc = circular_aperture(npix=256, diameter=128, centered=true);
@@ -97,18 +97,25 @@ imview(psf, zoom=8, color="Greys") #view psf from the top
 clf()
 plot(collect(1:npix), psf[div(npix,2),:]); #plot a slice
 
+# OTF
+otf = fftshift(fft(psf)); #fft result always need to be shifted
+mtf = abs.(otf);
+imsurf(mtf) #3d view of the mtf
+
+
+
 ## Aberrations
 ##
 
 # Visualize the first 16 Zernikes one by one
 npix=512;
-aperture = circular_aperture(npix=npix, diameter=64, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
+aperture = circular_aperture(npix=npix, diameter=32, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
 aperture = aperture/norm(aperture);  # pupil normalization
 fig = figure("PSF affected by single Zernike mode",figsize=(12,12))
 maxpsfzero=1
 strehl = 1
-for i=1:16
-  phase= 20.0*zernike(i, npix=npix, diameter=64, centered=true);
+for i=1:36
+  phase= 80.0*zernike(i, npix=npix, diameter=64, centered=true);
   pupil=aperture.*cis.(phase);
   psf=abs2.(ifft(pupil)*npix); #the npix factor is for the normalization of the fft
   psf = fftshift(psf); # fft is centered on [1,1], but we want it on npix/2,npix/2
@@ -118,15 +125,10 @@ for i=1:16
   else
     global strehl = maximum(psf)/maxpsfzero
   end
-  ax=fig.add_subplot(4,4,i)
-  #ax.axes.get_xaxis.set_ticks([]);
-  #ax.axes.get_yaxis.set_ticks([]);
+  ax=fig.add_subplot(6,6,i)
+  ax.axes.get_xaxis().set_ticks([]);
+  ax.axes.get_yaxis().set_ticks([]);
   imview_add(psf.^.8, zoom=4, color="Greys")
   title("Zernike $i")
   println("Noll: ", i, " Flux : ", sum(psf), " Strehl: ", strehl)
 end
-
-# OTF
-otf = fftshift(fft(psf)); #fft result always need to be shifted
-mtf = abs.(otf);
-imsurf(mtf) #3d view of the mtf

@@ -1,4 +1,4 @@
-using OptimPack
+using OptimPackNextGen
 include("optics.jl")
 x_true = read(FITS("jupiter.fits")[1])*1.;
 # Generate data

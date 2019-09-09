@@ -16,11 +16,11 @@ function imview(x;title="",zoom=1, color="gray")
     tight_layout()
 end
 
-function imsurf(z; title="", zoom=1, color="coolwarm")
+function imsurf(z; figtitle="", zoom=1, color="coolwarm")
     if zoom < 1
         zoom = 1
     end
-    fig = figure(title,figsize=(10,10))
+    fig = figure(figtitle,figsize=(10,10))
     clf()
     axis("equal")
     nx = size(z,1)
@@ -30,7 +30,7 @@ function imsurf(z; title="", zoom=1, color="coolwarm")
     zoom_span_x = max(1, Int(floor(nx/(2*zoom))))
     zoom_span_y = max(1, Int(floor(ny/(2*zoom))))
     zoomed = z[center_x-zoom_span_x+1:center_x+zoom_span_x, center_y-zoom_span_y+1:center_y+zoom_span_y]
-    zoomed[isnan.(zoomed)]=0
+    zoomed[isnan.(zoomed)].=0
     x = collect(1:size(zoomed,1))
     y = collect(1:size(zoomed,2))
     surf(x,y,zoomed, facecolors=get_cmap(color)(zoomed/maximum(zoomed)), linewidth=0.25, rstride=4, edgecolors="k", cstride=4,antialiased=false, shade=false)

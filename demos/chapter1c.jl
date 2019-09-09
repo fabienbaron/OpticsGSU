@@ -1,4 +1,4 @@
-include("optics.jl");
+using OpticsGSU
 
 #Read in Dr03 phase screens  (N.B. these screens give D/r0=3 over the entire data cube)
 f=FITS("Dr03_phases.fits"); phase_orig = read(f[1]); close(f);
@@ -13,12 +13,12 @@ jlim=500
 phase=zeros(size(phase_orig));
 
 # Compute second and third Zernike maps (for tip and tilt): center is at [npix/2+1,npix/2+1]
-zern1 = zernike(1,npix,npix,centered=true);
-zern2 = zernike(2,npix,npix,centered=true);
-zern3 = zernike(3,npix,npix,centered=true);
+zern1 = zernike(1,npix=npix,diameter=npix,centered=true);
+zern2 = zernike(2,npix=npix,diameter=npix,centered=true);
+zern3 = zernike(3,npix=npix,diameter=npix,centered=true);
 
 #Only look at phase inside aperture
-aperture = circular_aperture(npix,npix,centered=true);
+aperture = circular_aperture(npix=npix,diameter=npix,centered=true);
 phase = phase_orig .* aperture;
 
 indx= find(repeat(aperture,outer=[1,1,500]).>0.5);

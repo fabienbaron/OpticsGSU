@@ -58,7 +58,7 @@ function zernike_rad(n, m, rho)
     end
 end
 
-function zernike(j; npix::Int64=128, diameter::Int64=128, cent_x::Float64=-1.0, cent_y::Float64=-1.0, outside::Float64=0.0, noll_normalize::Bool=true, centered::Bool=false)
+function zernike(j; npix::Int64=128, diameter::Union{Float64,Int64}=128, cent_x::Float64=-1.0, cent_y::Float64=-1.0, outside::Float64=0.0, noll_normalize::Bool=true, centered::Bool=false)
   """Return the Zernike polynomial Z[j] for a given pupil.
   For this function the desired Zernike is specified by the Noll index j.
   See zernike_nm for an equivalent function in which the polynomials are ordered by n,m
@@ -111,7 +111,7 @@ end
 return norm_coeff*zernike_rad(n, 0, rho).*aperture
 end
 
-function circular_aperture(;npix::Int64=128, diameter::Int64=128, cent_x::Float64=64.5, cent_y::Float64=64.5, outside::Float64=0.0, centered::Bool = false)
+function circular_aperture(;npix::Int64=128, diameter::Union{Float64,Int64}=128, cent_x::Float64=64.5, cent_y::Float64=64.5, outside::Float64=0.0, centered::Bool = false)
   """
   Returns a 2D aperture of the desired diameter pixels, centered on (cent_x,cent_y) and on support npix X npix
   """
