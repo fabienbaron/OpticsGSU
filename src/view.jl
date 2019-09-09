@@ -16,6 +16,29 @@ function imview(x;title="",zoom=1, color="gray")
     tight_layout()
 end
 
+function imview2(x1, x2; figtitle="", caption1="", caption2 = "", zoom=1, color="gray")
+    if zoom < 1
+        zoom = 1
+    end
+    fig = figure(figtitle,figsize=(10,5))
+    clf()
+    nx = size(x1,1)
+    ny = size(x1,2)
+    center_x = div(nx+1,2)
+    center_y = div(ny+1,2)
+    zoom_span_x = max(1, Int(floor(nx/(2*zoom))))
+    zoom_span_y = max(1, Int(floor(ny/(2*zoom))))
+
+    subplot(1,2,1);
+    imshow(x1[center_x-zoom_span_x+1:center_x+zoom_span_x, center_y-zoom_span_y+1:center_y+zoom_span_y], cmap=ColorMap(color), interpolation="none");
+    title(caption1)
+    subplot(1,2,2);
+    imshow(x2[center_x-zoom_span_x+1:center_x+zoom_span_x, center_y-zoom_span_y+1:center_y+zoom_span_y], cmap=ColorMap(color), interpolation="none");
+    title(caption2)
+    tight_layout()
+end
+
+
 function imsurf(z; figtitle="", zoom=1, color="coolwarm")
     if zoom < 1
         zoom = 1

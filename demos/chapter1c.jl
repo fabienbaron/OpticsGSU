@@ -1,7 +1,7 @@
 using OpticsGSU
 
 #Read in Dr03 phase screens  (N.B. these screens give D/r0=3 over the entire data cube)
-f=FITS("Dr03_phases.fits"); phase_orig = read(f[1]); close(f);
+f=FITS("./data/Dr03_phases.fits.fz"); phase_orig = read(f[1]); close(f);
 
 # Number of pixels across Dr03 phase array
 npix = size(phase_orig,1)

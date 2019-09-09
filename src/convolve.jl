@@ -1,4 +1,6 @@
 using FFTW
+using LinearAlgebra
+
 function conv_psf_obj(psf::Array{Float64,2}, object::Array{Float64,2})
 return real.(fftshift(ifft(fft(object).*fft(psf))));
 end
@@ -13,7 +15,7 @@ end
 
 function pupil_to_psf(pup_amplitude, pup_phase)
     pupil= pup_amplitude.*cis.(pup_phase)
-    pupil /= norm(pupil);
+    pupil ./= norm(pupil);
     psf = abs2.(ifft(pupil)*size(pupil,1));
     return fftshift(psf);
 end
