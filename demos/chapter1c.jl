@@ -1,7 +1,7 @@
 using OpticsGSU
-
+using Statistics
 #Read in Dr03 phase screens  (N.B. these screens give D/r0=3 over the entire data cube)
-f=FITS("./data/Dr03_phases.fits.fz"); phase_orig = read(f[1]); close(f);
+phase_orig=readfits("./data/Dr03_phases.fits.fz");
 
 # Number of pixels across Dr03 phase array
 npix = size(phase_orig,1)
@@ -21,7 +21,7 @@ zern3 = zernike(3,npix=npix,diameter=npix,centered=true);
 aperture = circular_aperture(npix=npix,diameter=npix,centered=true);
 phase = phase_orig .* aperture;
 
-indx= find(repeat(aperture,outer=[1,1,500]).>0.5);
+indx= findall(repeat(aperture,outer=[1,1,500]).>0.5);
 # Compute d/r0 over subsection all phase pixels
 std_dev = std(phase[indx]);
 dr0 = (std_dev^2/1.03)^(3/5);
