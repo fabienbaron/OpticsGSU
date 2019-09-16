@@ -62,7 +62,7 @@ imview(recomposed_phase,title="Recomposed phase");
 # GOLAY pupils
 
 #Golay-3 sub-aperture positions
-npix=256
+npix=1024
 centers_x=[-0.5,0.5,0]*npix/4
 centers_y = [-sqrt(3)/6,-sqrt(3)/6,sqrt(3)/3]*npix/4
 
