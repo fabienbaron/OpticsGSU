@@ -27,10 +27,10 @@ wiener_denom = zeros(Complex{Float64},npix,npix);
 image_blurred = zeros(Float64, size(image_spec));
 for i=1:500
    psf = pupil_to_psf(aperture, pad(phase[:,:,i]*2.72219,npad));
-   image_spec_instant = conv_psf_obj(psf, obj);
-   image_spec_instant = image_spec_instant + maximum(image_spec_instant)/50*randn(Float64, size(image_spec_instant));
-   global image_blurred += image_spec_instant;
-   global wiener_numer += fft(image_spec_instant).*conj(fft(psf))
+   image_spec = conv_psf_obj(psf, obj);
+   image_spec = image_spec + maximum(image_spec)/50*randn(Float64, size(image_spec));
+   global image_blurred += image_spec;
+   global wiener_numer += fft(image_spec).*conj(fft(psf))
    global wiener_denom += abs2.(fft(psf)) .+ 1.0e-5
 end
 wiener_obj =real(fftshift(ifft(wiener_numer./wiener_denom)))
