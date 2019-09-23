@@ -1,3 +1,7 @@
+#
+# WARNING: Noiseless 
+#
+
 using OpticsGSU
 using FFTW
 obj=readfits("./data/jupiter.fits")*1.0
