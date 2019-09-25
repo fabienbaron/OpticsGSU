@@ -89,5 +89,5 @@ xlabel("Data");
 subplot(1,4,4);
 imshow(x4, interpolation="none",  cmap=ColorMap(color))
 xlabel("Reconstructed");
-#tight_layout();
+tight_layout();
 end

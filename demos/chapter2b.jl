@@ -22,9 +22,9 @@ end
 x_init = rand(Float64, size(x_noisy));
 dummy = similar(x_init);
 
-for μ=[1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1,1e2,1e3,1e4]
+for μ=[0, 1e-6, 5e-6, 1e-5, 5e-5, 1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 1]
 crit = (x,g)->epsilon_tik(x, g, x_noisy, σ, psf, μ);
-x_sol = OptimPackNextGen.vmlmb(crit, x_init, verb=false, lower=0, maxiter=2000); # positivity is imposed here
+x_sol = OptimPackNextGen.vmlmb(crit, x_init, verb=true, lower=0, maxiter=2000); # positivity is imposed here
 imview4(x_true, x_conv, x_noisy, x_sol);
 println("μ = $(μ)\t ϵ = $(crit(x_sol, dummy ))\t dist = $(norm(x_sol - x_true,1))\n");
 readline();
@@ -41,11 +41,12 @@ DtD= D'D
 
 function epsilon_tv(model, g, data, σ, psf, μ)
     res = (data - convolve(model,psf) ) / σ;
-    f= sum(res.^2) + μ*norm(D*vec(model),2)^2; # chi2 + Tikhonov regularization
-    g[:] = -2/σ*correlate(res,psf)+2*μ*reshape(DtD*vec(model), size(model));
+    x= vec(model);
+    f= sum(res.^2) + μ*norm(D*x,2)^2; # chi2 + Tikhonov regularization
+    g[:] = -2/σ*correlate(res,psf)+2*μ*reshape(DtD*x, size(model));
     return f;
 end
-for μ=[1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
+for μ=[0, 1e-6, 5e-6, 1e-5, 5e-5, 1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 1]
 crit = (x,g)->epsilon_tv(x, g, x_noisy, σ, psf, μ);
 x_sol = OptimPackNextGen.vmlmb(crit, x_init, verb=false, lower=0, maxiter=2000); # positivity is imposed here
 imview4(x_true, x_conv, x_noisy, x_sol);
