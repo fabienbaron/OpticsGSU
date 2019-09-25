@@ -82,12 +82,12 @@ imshow(x1, interpolation="none",  cmap=ColorMap(color))
 xlabel("Object");
 subplot(1,4,2);
 imshow(x2, interpolation="none",  cmap=ColorMap(color))
-xlabel("Data");
+xlabel("Convolved object");
 subplot(1,4,3);
 imshow(x3, interpolation="none",  cmap=ColorMap(color))
-xlabel("Reconstructed");
+xlabel("Data");
 subplot(1,4,4);
 imshow(x4, interpolation="none",  cmap=ColorMap(color))
-xlabel("Convolved reconstruction");
-tight_layout();
+xlabel("Reconstructed");
+#tight_layout();
 end
