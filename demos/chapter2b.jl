@@ -8,7 +8,7 @@ npix = size(x_true,1);
 psf = gaussian2d(npix,npix,5);
 #psf= zeros(npix,npix); psf[125:131,128]=1.0; psf[128,125:131]=1.0;
 x_conv = convolve(psf,x_true);
-σ = maximum(x_conv)/10.;
+σ = maximum(x_conv)/100.;
 x_noisy = x_conv + σ.*randn(Float64, size(x_true));
 
 # Function to minimize + gradient w/r object pixels
@@ -46,7 +46,7 @@ function epsilon_tv(object, g, data, σ, psf, μ)
     return f;
 end
 #for μ=[1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1]
-μ=0.01
+μ=0.005
 crit = (x,g)->epsilon_tv(x, g, x_noisy, σ, psf, μ);
 x_sol = OptimPackNextGen.vmlmb(crit, x_init, verb=true, lower=0, maxiter=2000); # positivity is imposed here
 imview4(x_true, x_conv, x_noisy, x_sol);
