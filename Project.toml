@@ -1,3 +1,9 @@
+name = "OpticsGSU"
+uuid = "efe4cb44-55b5-4cec-bbbf-9936324c6618"
+authors = ["Fabien Baron <fbaron@gsu.edu>"]
+version = "1.0.0"
+
+
 [deps]
 ArrayTools = "1dc0ca97-c5ce-4e77-ac6d-c576ac9d7f27"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
