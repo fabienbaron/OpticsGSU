@@ -1,6 +1,4 @@
-using Images
-using FITSIO
-using PyPlot
+using Images, FITSIO, PyPlot
 
 function imscale(image, scale)
 newsize = (Int(round(scale*size(image,1))), Int(round(scale*size(image,2))))

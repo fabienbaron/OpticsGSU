@@ -1,5 +1,4 @@
-using FFTW
-using LinearAlgebra
+using FFTW, LinearAlgebra
 
 function conv_psf_obj(psf::Array{Float64,2}, object::Array{Float64,2})
 return real.(fftshift(ifft(fft(object).*fft(psf))));
