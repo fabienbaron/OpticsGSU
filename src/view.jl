@@ -91,3 +91,24 @@ imshow(x4, interpolation="none",  cmap=ColorMap(color))
 xlabel("Reconstructed");
 tight_layout();
 end
+
+function imview3(xtruth,xnoisy,xreconst;figtitle="", color="gray")
+    if(ndims(xtruth)==1)
+        nx = Int(sqrt(length(xtruth)));
+        xtruth = reshape(xtruth,nx,nx);
+        xnoisy = reshape(xnoisy,nx,nx);
+        xreconst = reshape(xreconst,nx,nx);
+    end
+
+    fig = figure(figtitle,figsize=(15,5))
+    subplot(1,3,1)
+    imshow(xtruth, cmap=ColorMap(color), interpolation="none");
+    title("Truth")
+    subplot(1,3,2)
+    imshow(xnoisy, cmap=ColorMap(color), interpolation="none");
+    title("Noisy")
+    subplot(1,3,3)
+    imshow(xreconst, cmap=ColorMap(color), interpolation="none");
+    title("Reconstructed")
+    tight_layout()
+end

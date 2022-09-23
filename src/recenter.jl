@@ -9,6 +9,6 @@ return [pos[1],pos[2]]
 end
 
 function recenter(x, center) #note: this takes a 2D array
-Δ=[(size(x,1)+1)/2, (size(x,2)+1)/2]-center
+Δ=[div(size(x,1),2)+1, div(size(x,2),2)+1]-center
 return circshift(x,round.(Δ))
 end
