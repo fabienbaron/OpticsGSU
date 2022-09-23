@@ -2,10 +2,11 @@
 
 ## Prerequisites
 
-OpticsGSU uses OptimPackNextGen, which requires Eric Thiebault's repository.
+OpticsGSU uses OptimPackNextGen, which requires Eric Thiebault's repository as well as the default repo.
 
 ```julia
 using Pkg
+pkg"registry add General"
 pkg"registry add https://github.com/emmt/EmmtRegistry"
 ```
 
