@@ -1,6 +1,6 @@
 # High Angular Resolution Imaging ASTR8800
 
-## Prerequisites
+## Prerequisites/Installation
 
 OpticsGSU uses OptimPackNextGen, which requires Eric Thiebault's repository as well as the default repo.
 
@@ -8,9 +8,8 @@ OpticsGSU uses OptimPackNextGen, which requires Eric Thiebault's repository as w
 using Pkg
 pkg"registry add General"
 pkg"registry add https://github.com/emmt/EmmtRegistry"
+pkg"add https://github.com/fabienbaron/OpticsGSU.git"
 ```
-
-## Installation
 
 Only proceed with this installation once you've got all the prerequisites installed.
 From Julia's command line, press ```]``` to access the package manager.
