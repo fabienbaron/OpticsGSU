@@ -187,10 +187,3 @@ function pad_array(array0, size_desired)
    end
    return array_return
 end
-
-function pupil_to_psf(pup_amplitude, pup_phase)
-    pupil= pup_amplitude.*cis.(pup_phase)
-    pupil ./= norm(pupil);
-    psf = abs2.(ifft(pupil)*size(pupil,1));
-    return ifftshift(psf);
-end

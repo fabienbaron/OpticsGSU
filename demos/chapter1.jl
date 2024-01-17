@@ -1,9 +1,4 @@
-using OpticsGSU;
-using PyPlot
-using FITSIO
-using FFTW
-using LinearAlgebra
-
+using OpticsGSU, PyPlot, LinearAlgebra
 #Create a disc pupil
 # Because of the Fourier transform later on, we would like it to be in a double-sized support
 pupil_disc = circular_aperture(npix=256, diameter=128, centered=true);
@@ -54,7 +49,7 @@ end
 println("Decomposition coefficients: ", a);
 recomposed_phase = zeros(size(phase)) # array of zeros of the same size as the original phase
 for i=1:nz
-   global recomposed_phase += a[i]*zernike(i, npix=npix_phase, diameter=npix_phase, centered=true)
+  recomposed_phase += a[i]*zernike(i, npix=npix_phase, diameter=npix_phase, centered=true)
 end
 imview(recomposed_phase,title="Recomposed phase");
 
@@ -69,7 +64,7 @@ centers_y = [-sqrt(3)/6,-sqrt(3)/6,sqrt(3)/3]*npix/4
 diam = 64 #sub-aperture diameter
 aperture = zeros(npix,npix)
 for i=1:length(centers_x)
- global aperture += circular_aperture(npix=npix, diameter=diam, cent_x =(npix+1)/2+centers_x[i], cent_y = (npix+1)/2+centers_y[i])
+ aperture += circular_aperture(npix=npix, diameter=diam, cent_x =(npix+1)/2+centers_x[i], cent_y = (npix+1)/2+centers_y[i])
 end
 imview(aperture, title="Golay-3")
 
@@ -80,7 +75,7 @@ centers_y=[2,-1,-4,-4,2,5]*sqrt(3)/6*npix/4
 diam = 64 #sub-aperture diameter
 aperture = zeros(npix,npix)
 for i=1:length(centers_x)
- global aperture += circular_aperture(npix=npix, diameter=diam, cent_x = (npix+1)/2+centers_x[i], cent_y = (npix+1)/2+centers_y[i])
+ aperture += circular_aperture(npix=npix, diameter=diam, cent_x = (npix+1)/2+centers_x[i], cent_y = (npix+1)/2+centers_y[i])
 end
 imview(aperture, title="Golay-6")
 
@@ -90,13 +85,11 @@ npix=1024;
 aperture = circular_aperture(npix=npix, diameter=32, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
 aperture = aperture./norm(aperture);  # pupil normalization
 #phase= zernike(4, npix, npix/2, centered=true);
-phase = 0
+phase = zeros(npix, npix)
 pupil=aperture.*cis.(phase);
-psf=abs2.(ifft(pupil)*npix); #the npix factor is for the normalization of the fft
-psf = fftshift(psf); # fft is centered on [1,1], but we want it on npix/2,npix/2
+psf = abs2.(ift2(pupil)*npix); #the npix factor is for the normalization of the fft
 sum(psf) # should be == 1  !
 imview(psf, zoom=8, color="Greys") #view psf from the top
-clf()
 plot(collect(1:npix), psf[div(npix,2),:]); #plot a slice
 
 # OTF
