@@ -82,7 +82,7 @@ imview(aperture, title="Golay-6")
 # Making a PSF
 
 npix=1024;
-aperture = circular_aperture(npix=npix, diameter=32, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
+aperture = circular_aperture(npix=npix, diameter=32, centered=true); # max npix/2 because of Nyquist sampling
 aperture = aperture./norm(aperture);  # pupil normalization
 #phase= zernike(4, npix, npix/2, centered=true);
 phase = zeros(npix, npix)
@@ -90,14 +90,13 @@ pupil=aperture.*cis.(phase);
 psf = abs2.(ift2(pupil)*npix); #the npix factor is for the normalization of the fft
 sum(psf) # should be == 1  !
 imview(psf, zoom=8, color="Greys") #view psf from the top
-plot(collect(1:npix), psf[div(npix,2),:]); #plot a slice
+clf(); plot(collect(1:npix), psf[div(npix,2)+1,:]); #plot a slice
 
 # OTF
-otf = fftshift(fft(psf)); #fft result always need to be shifted
+otf = ft2(psf); 
 mtf = abs.(otf);
+clf(); plot(collect(1:npix), mtf[div(npix,2)+1,:]); #plot a slice
 imsurf(mtf) #3d view of the mtf
-plot(collect(1:npix), mtf[div(npix,2),:]); #plot a slice
-
 
 
 ## Aberrations
@@ -113,13 +112,12 @@ strehl = 1
 for i=1:25
   phase= 100*zernike(i, npix=npix, diameter=64, centered=true);
   pupil=aperture.*cis.(phase);
-  psf=abs2.(ifft(pupil)*npix); #the npix factor is for the normalization of the fft
-  psf = fftshift(psf); # fft is centered on [1,1], but we want it on npix/2,npix/2
+  psf=abs2.(ift2(pupil)*npix); #the npix factor is for the normalization of the fft
   if i==1
-    global strehl = 1
-    global maxpsfzero = maximum(psf)
+    strehl = 1
+    maxpsfzero = maximum(psf)
   else
-    global strehl = maximum(psf)/maxpsfzero
+    strehl = maximum(psf)/maxpsfzero
   end
   ax=fig.add_subplot(5,5,i)
   ax.axes.get_xaxis().set_ticks([]);
