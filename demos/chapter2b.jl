@@ -1,4 +1,4 @@
-using OpticsGSU, OptimPackNextGen, PyPlot, LinearAlgebra, SparseArrays
+using OpticsGSU, OptimPackNextGen, PythonPlot, LinearAlgebra, SparseArrays
 # Note: to install OptimPackNextGen, do the following with Julia's package manager:
 # add https://github.com/emmt/LazyAlgebra.jl.git https://github.com/emmt/OptimPackNextGen.jl.git
 

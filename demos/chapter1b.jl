@@ -28,7 +28,7 @@ otfs = zeros(ComplexF64, npix, npix, nframes )
 σ = 1/10
 for i=1:nframes
    psfs[:,:,i] = pupil_to_psf(aperture, pad(phase[:,:,i],npad));
-   otfs[:,:,i] = fft(psfs[:,:,i]);
+   otfs[:,:,i] = ft2(psfs[:,:,i]);
    image_data_noiseless[:,:,i] = conv_psf_obj(psfs[:,:,i], obj);
    image_data_noisy[:,:,i] = image_data_noiseless[:,:,i] + σ*randn(npix,npix);
 end
