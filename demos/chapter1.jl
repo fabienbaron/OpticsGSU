@@ -107,6 +107,7 @@ npix=512;
 aperture = circular_aperture(npix=npix, diameter=32, centered=true); # npix/2 because FFT needs padded pupil by a factor 2
 aperture = aperture/norm(aperture);  # pupil normalization
 fig = figure("PSF affected by single Zernike mode",figsize=(12,12))
+ax = fig.subplots(5,5)
 maxpsfzero=1
 strehl = 1
 for i=1:25
@@ -119,9 +120,9 @@ for i=1:25
   else
     strehl = maximum(psf)/maxpsfzero
   end
-  ax=fig.add_subplot(5,5,i)
-  ax.axes.get_xaxis().set_ticks([]);
-  ax.axes.get_yaxis().set_ticks([]);
+  subplot(5,5,i)
+ # ax.axes.get_xaxis().set_ticks([]);
+ # ax.axes.get_yaxis().set_ticks([]);
   imview_add(psf.^.5, zoom=4, color="gist_yarg")
   title("Zernike $i")
   println("Noll: ", i, " Flux : ", sum(psf), " Strehl: ", strehl)
