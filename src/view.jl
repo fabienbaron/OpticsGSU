@@ -56,7 +56,7 @@ function imsurf(z; figtitle="", zoom=1, color="coolwarm")
     zoomed[isnan.(zoomed)].=0
     x = collect(1:size(zoomed,1))
     y = collect(1:size(zoomed,2))
-    surf(x,y,zoomed, facecolors=get_cmap(color)(zoomed/maximum(zoomed)), linewidth=0.25, rstride=4, edgecolors="k", cstride=4,antialiased=false, shade=false)
+    surf(x,y,zoomed, facecolors=get_cmap(color)(zoomed/maximum(zoomed)), linewidth=0.25, rstride=4, cstride=4,antialiased=false, shade=false)
     tight_layout()
 end
 

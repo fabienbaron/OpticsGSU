@@ -92,9 +92,11 @@ sum(psf) # should be == 1  !
 imview(psf, zoom=8, color="Greys") #view psf from the top
 clf(); plot(collect(1:npix), psf[div(npix,2)+1,:]); #plot a slice
 
-# OTF
-otf = ft2(psf); 
+# Optical Transfer Function
+otf = ft2(psf);
+# Modulus Transfer Function 
 mtf = abs.(otf);
+
 clf(); plot(collect(1:npix), mtf[div(npix,2)+1,:]); #plot a slice
 imsurf(mtf) #3d view of the mtf
 
