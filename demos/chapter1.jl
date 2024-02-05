@@ -111,8 +111,8 @@ ax = fig.subplots(5,5)
 maxpsfzero=1
 strehl = 1
 for i=1:25
-  phase= 100*zernike(i, npix=npix, diameter=64, centered=true);
-  pupil=aperture.*cis.(phase);
+  phase = 100*zernike(i, npix=npix, diameter=64, centered=true);
+  pupil = aperture.*cis.(phase);
   psf=abs2.(ift2(pupil)*npix); #the npix factor is for the normalization of the fft
   if i==1
     strehl = 1

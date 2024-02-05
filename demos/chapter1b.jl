@@ -7,7 +7,7 @@ obj=rotl90(readfits("./data/jupiter.fits")*1.0)
 npix=size(obj,1)
 # Exercice 1 : create Gaussian PSF with sigma=5 pixels
 psf_gaussian=gaussian2d(npix,npix,5)
-image = conv_psf_obj(psf_gaussian, obj);
+image = convolve(psf_gaussian, obj);
 imview(image, title="Image");
 
 # Read phase screen
@@ -16,7 +16,6 @@ phase=readfits("./data/Dr03_phases.fits.fz");  # turbulence
 phase *= α
 aperture=circular_aperture(npix=npix,diameter=npix/2.,centered=true);
 npad = div(max(npix-size(phase,1),0),2); # we may need to pad the phase screen
-
 
 
 # Compute speckle data  - Gaussian Noise
@@ -29,7 +28,7 @@ otfs = zeros(ComplexF64, npix, npix, nframes )
 for i=1:nframes
    psfs[:,:,i] = pupil_to_psf(aperture, pad(phase[:,:,i],npad));
    otfs[:,:,i] = ft2(psfs[:,:,i]);
-   image_data_noiseless[:,:,i] = conv_psf_obj(psfs[:,:,i], obj);
+   image_data_noiseless[:,:,i] = convolve(psfs[:,:,i], obj);
    image_data_noisy[:,:,i] = image_data_noiseless[:,:,i] + σ*randn(npix,npix);
 end
 writefits(image_data_noiseless, "./data/speckle_fake_data_noiseless.fits")
@@ -43,12 +42,12 @@ psf = pupil_to_psf(aperture, pad(phase[:,:,1],npad));
 
 
 # no noise
-image_spec = conv_psf_obj(psf, obj) + 0*randn(npix,npix);
+image_spec = convolve(psf, obj) + 0*randn(npix,npix);
 direct_obj=real(fftshift(ifft(fft(image_spec)./(fft(psf).+1.0e-15))))      # adding small number because psf have 0, and we couldn't divided by 0.
 imview2(image_spec, direct_obj, caption1="Speckle image", caption2="Direct Inversion (no noise on data)", figtitle="Direct Inversion")
 
 # A slight amount of noise
-image_spec = conv_psf_obj(psf, obj) + randn(npix,npix)/10000;
+image_spec = convolve(psf, obj) + randn(npix,npix)/10000;
 direct_obj=real(fftshift(ifft(fft(image_spec)./(fft(psf).+1.0e-15))))      # adding small number because psf have 0, and we couldn't divided by 0.
 imview2(image_spec, direct_obj, caption1="Speckle image", caption2="Direct Inversion", figtitle="Direct Inversion")
 
