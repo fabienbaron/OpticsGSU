@@ -6,7 +6,7 @@ using OpticsGSU, FFTW, LinearAlgebra, Noise
 obj=rotl90(readfits("./data/jupiter.fits")*1.0)
 npix=size(obj,1)
 # Exercice 1 : create Gaussian PSF with sigma=5 pixels
-psf_gaussian=gaussian2d(npix,npix,5)
+psf_gaussian=gaussian2d(npix,npix,5);
 image = convolve(psf_gaussian, obj);
 imview(image, title="Image");
 
