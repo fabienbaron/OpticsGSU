@@ -3,10 +3,9 @@
 ## Prerequisites/Installation
 
 OpticsGSU uses OptimPackNextGen, which requires Eric Thiebault's repository as well as the default repo.
-At the moment we are using PythonPlot with the Qt5 backend.
+At the moment we are using PyPlot with the Qt5 backend.
 
 ```julia
-ENV["PYTHON"]=""
 using Pkg
 pkg"registry add General"
 pkg"registry add https://github.com/emmt/EmmtRegistry"

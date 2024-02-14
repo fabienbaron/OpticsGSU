@@ -1,4 +1,4 @@
-using OpticsGSU, PythonPlot, LinearAlgebra
+using OpticsGSU, PyPlot, LinearAlgebra
 
 D = 0.7 #m 
 lambda = collect(range(400.0, 1000.0, step=50))*1e-9 #m
