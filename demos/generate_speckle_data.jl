@@ -7,15 +7,15 @@ N = pupil_support_size(D, pixscale_wanted) # pick size ensuring minimum sampling
 pixscale = D/(N/2) 
 
 # min and max observing wavelengths [m]
-λmin=550.0e-9
-λmax=550.0e-9
+λmin=400.0e-9
+λmax=1000.0e-9
 resolution = 0.25*λmin*1e6/D/2.0 # assuming Nyquist sampling of pupil at 400 nm
 println("Nyquist pixel scale = ", resolution," [arcsec]")
 
 #
 # DETECTOR SETUP
 #
-nframes = 100 # Number of frames
+nframes = 10 # Number of frames
 exptime=10e-3; # exposure time for each frame
 timestamps = (0:nframes-1)*exptime 
 detector = Detector(true, true, UInt16, .60, 1.0, 2^12-1, 2.0, exptime)
@@ -32,7 +32,7 @@ nwavs = length(λ);
 # OBJECT SETUP
 #
 object, ~, ~ = generate_hyperspectral_object(N, λ, template= "./data/sat_template2.fits");
-mag1 = 4
+mag1 = 8
 f1 = flux(mag1, tel_surf=pi*(D/2)^2, airmass = 1.0, exptime=detector.exptime);
 #indx_λV=findall(abs.(λ.-540e-9).<89e-9); # Using a rough definition of V
 #object *= f1/sum(object[:,:,indx_λV]); # Flux scaling
