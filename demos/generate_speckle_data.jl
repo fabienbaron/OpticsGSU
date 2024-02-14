@@ -45,13 +45,13 @@ object_sampling = copy(pixscale)
 # ATMOSPHERE  -- TBD add zenith to atmosphere structure
 #
 z = 17/360.0*2*pi;            # observation: angular distance from zenith [radians]
-elevation = 2400f0; # observation: elevation
+elevation = 2400; # observation: elevation
 nlayers = 3; # number of atmospheric layers
-Dz = 30f3;        # propagation distance/elevation highest layer [m]
+Dz = 30e3;        # propagation distance/elevation highest layer [m]
 winds = Float32.([  0.0 3.0 ; 0.0 80.0; 0.0 25 ])     # (m/s, deg) 0deg = East, increases clockwise
-l0 = collect(range(3f-3,3f-2,length=nlayers));
-L0 = collect(range(10f0,2000f0,length=nlayers));
-layer_heights=elevation .+ [0f0; [1:nlayers-1;] * Dz  / (nlayers-1)];
+l0 = collect(range(3e-3,3e-2,length=nlayers));
+L0 = collect(range(10,2000,length=nlayers));
+layer_heights=elevation .+ [0; [1:nlayers-1;] * Dz  / (nlayers-1)];
 Cn2 = (reverse(CN2_huffnagel_valley_generalized(layer_heights, A=9.9e-15, C = 5.94e-53)))/5;
 Nscreens = phase_screen_size(D, timestamps, winds, pixscale); # atmosphere screen size so that pixels are ~2cm
 atmosphere = Atmosphere(Nscreens, λ, Float32.(layer_heights), Float32.(l0), Float32.(L0), Float32.(Cn2), Float32.(winds)); # This will construct the atmosphere with blank screens
