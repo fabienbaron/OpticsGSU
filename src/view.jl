@@ -1,4 +1,4 @@
-using PythonPlot
+using PyPlot
 
 function imview(x;title="",zoom=1, color="gray")
     if zoom < 1
