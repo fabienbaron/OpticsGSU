@@ -18,7 +18,7 @@ println("Nyquist pixel scale = ", resolution," [arcsec]")
 nframes = 100 # Number of frames
 exptime=10e-3; # exposure time for each frame
 timestamps = (0:nframes-1)*exptime 
-detector = Detector(false, false, UInt16, 1.0, 1.0, 2^12-1, 0.0, exptime)
+detector = Detector(true, true, UInt16, .60, 1.0, 2^12-1, 2.0, exptime)
 #poisson::Bool, adu::Bool, aduTYPE::DataType, qe::Array{Float32,1}, gain::Float32, saturation::Int32,σ_ron::Float32, exptime::Float32 
 
 #
@@ -48,7 +48,7 @@ z = 17/360.0*2*pi;            # observation: angular distance from zenith [radia
 elevation = 2400; # observation: elevation
 nlayers = 3; # number of atmospheric layers
 Dz = 30e3;        # propagation distance/elevation highest layer [m]
-winds = Float32.([  0.0 3.0 ; 0.0 80.0; 0.0 25 ])     # (m/s, deg) 0deg = East, increases clockwise
+winds = Float32.([  10.0 45.0 ; 5.0 -30; 3.0 25 ])     # (m/s, deg) 0deg = East, increases clockwise
 l0 = collect(range(3e-3,3e-2,length=nlayers));
 L0 = collect(range(10,2000,length=nlayers));
 layer_heights=elevation .+ [0; [1:nlayers-1;] * Dz  / (nlayers-1)];
