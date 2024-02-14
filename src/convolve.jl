@@ -1,4 +1,6 @@
 using FFTW, LinearAlgebra
+# FFTW.set_provider!("mkl") 
+# FFTW.set_num_threads(Threads.nthreads())
 
 function ftn2(x)
     return fftshift(fft(fftshift(x)))/sqrt(length(x))
@@ -187,3 +189,39 @@ function pad_array(array0, size_desired)
    end
    return array_return
 end
+
+
+# Convolution experiments
+#=
+
+@btime img1=real.(ifftshift(ifft(fft(fftshift(obj_truth)).*fft(fftshift(psfs[:,:,1])))));
+@btime img2=ifftshift(irfft(rfft(obj_truth).*rfft(psfs[:,:,1]), 256));
+@btime img3=ifftshift(irfft(rfft(fftshift(obj_truth)).*rfft(fftshift(psfs[:,:,1])), 256));
+ 
+norm(img1-img2) -> ~5e-12
+norm(img2-img3) -> 0
+
+rfft(obj_truth)-rfft(fftshift(obj_truth)) -> there is a difference
+
+pow = fftshift(fft(fftshift(object)))
+y=real.(ifftshift(ifft(fftshift(fft(fftshift(object))).*fftshift(fft(fftshift(psf))))))
+ktud = real.(ifftshift(ifft(fftshift(conj(fft(fftshift(object)))).*fftshift(fft(fftshift(y))))))
+imshow(real.(ifftshift(ifft(ifftshift(fftshift(fft(fftshift(ktud)))./abs2.(pow))))))
+
+function invert(object, psf)
+pow2 = abs2.(ft2(object))
+y = convolve(object, psf)
+ktud =  convolve_tr(object, y)
+z1 = real.(ift2(ft2(ktud)./pow2))
+end
+
+
+function invert_r(object, psf)
+pow2 = abs2.(rft2(object))
+y = convolve_r(object, psf)
+ktud =  convolve_r_tr(object, y)
+z2 = real.(irft2(rft2(ktud)./pow2,size(object,1)))
+end
+
+
+=#

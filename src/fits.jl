@@ -1,16 +1,18 @@
 using FITSIO
+
 function readfits(fitsfile; normalize = false, vectorize=false)
-if fitsfile[end-1:end]=="fz"
-x = (read((FITS(fitsfile))[2]))
-else
+    x=[]
+    if fitsfile[end-1:end]=="fz"
+    x = (read((FITS(fitsfile))[2]))
+    else
     x = (read((FITS(fitsfile))[1]))
-end
-if normalize == true
- x ./= sum(x)
-end
-if vectorize == true
+    end
+    if normalize == true
+    x ./= sum(x)
+    end
+    if vectorize == true
     x = vec(x)
-end
+    end
 return x;
 end
 

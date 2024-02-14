@@ -83,8 +83,8 @@ function zernike(j; npix::Int64=128, diameter::Union{Float64,Int64}=128, cent_x:
           zern : 2D array Z[j] evaluated at each (rho, theta)
   """
 if (centered == true)|(cent_x==-1.0)|(cent_y==-1.0)
-  cent_x = div(npix,2)+1
-  cent_y = div(npix,2)+1
+  cent_x = npix÷2+1
+  cent_y = npix÷2+1
 end
 
 n, m = noll_indexes(j);
@@ -114,7 +114,7 @@ function circular_aperture(;npix::Int64=128, diameter::Union{Float64,Int64}=128,
   """
   Returns a 2D aperture of the desired diameter pixels, centered on (cent_x,cent_y) and on support npix X npix
   """
-if centered == true # following fftshift convention
+if centered == true
   cent_x = div(npix,2)+1
   cent_y = div(npix,2)+1
 end
