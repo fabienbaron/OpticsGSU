@@ -49,14 +49,13 @@ object_sampling = copy(pixscale)
 z = 17/360.0*2*pi;            # observation: angular distance from zenith [radians]
 elevation = 2400; # observation: elevation
 nlayers = 3; # number of atmospheric layers
-Dz = 30e3;        # propagation distance/elevation highest layer [m]
 winds = Float32.([  10.0 45.0 ; 5.0 -30; 3.0 25 ])     # (m/s, deg) 0deg = East, increases clockwise
 l0 = collect(range(3e-3,3e-2,length=nlayers));
 L0 = collect(range(10,2000,length=nlayers));
-layer_heights=elevation .+ [0; [1:nlayers-1;] * Dz  / (nlayers-1)];
-Cn2 = (reverse(CN2_huffnagel_valley_generalized(layer_heights, A=9.9e-15, C = 5.94e-53)))/5;
+layer_heights = elevation .+ [0, 10000, 30000, 40000]; 
+Cn2 = h->CN2_huffnagel_valley_generalized(Float64.(h), A=9.9e-15, C = 5.94e-53);
 Nscreens = phase_screen_size(D, timestamps, winds, pixscale); # atmosphere screen size so that pixels are ~2cm
-atmosphere = Atmosphere(Nscreens, λ, Float32.(layer_heights), Float32.(l0), Float32.(L0), Float32.(Cn2), Float32.(winds)); # This will construct the atmosphere with blank screens
+atmosphere = Atmosphere(Nscreens, λ, Float32.(layer_heights), Float32.(l0), Float32.(L0), Cn2, Float32.(winds)); # This will construct the atmosphere with blank screens
 atmosphere = instantiate_atmosphere(atmosphere, D, z, verbose = true, propagate=false);
 I = generate_isoplanatic_frozen_flow_phase_extractors(atmosphere, timestamps, N, object_distance, pixscale);
 

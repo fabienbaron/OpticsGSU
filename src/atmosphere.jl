@@ -7,7 +7,7 @@ mutable struct Atmosphere
     heights::Array{Float32,1}
     l0::Array{Float32,1}
     L0::Array{Float32,1}
-    Cn2::Array{Float32,1}
+    Cn2
     winds::Matrix{Float32}
     # Constructor should be able to fill the next ones:
     nλ::Int64
@@ -16,9 +16,9 @@ mutable struct Atmosphere
     phase_screens::Array{Float32, 4}
     composite_amplitude::Array{Float32, 3}
     composite_phase::Array{Float32, 3}
-    function Atmosphere(N::Int64, λ::Array{Float32,1}, heights::Array{Float32,1}, l0::Array{Float32,1}, L0::Array{Float32,1}, Cn2::Array{Float32,1}, wind_velocities::Matrix{Float32})
+    function Atmosphere(N::Int64, λ::Array{Float32,1}, heights::Array{Float32,1}, l0::Array{Float32,1}, L0::Array{Float32,1}, Cn2, wind_velocities::Matrix{Float32})
         nλ = length(λ)
-        nlayers = length(heights)
+        nlayers = length(heights)-1
         r0 = zeros(Float32, nlayers, nλ);
         phase_screens    = zeros(Float32, N, N, nlayers, nλ); # We will need 4x larger if we propagate
         composite_amplitude  = ones(Float32, N, N, nλ);
@@ -195,10 +195,13 @@ end
         ρ = meshrad([-Nscreen:Nscreen-1;] * δ1);
         sg = exp.(-(ρ/(FTYPE(0.47)*Nscreen)).^16);  # Super Gaussian absorbing boundary
         Utop = ones(FTYPE, Nscreen_double, Nscreen_double); # Amplitude at the top of the atmosphere
+        for ilayer = 1:nlayers
+            atmosphere.r0[ilayer,1] = cn2_profile_to_r0(atmosphere.Cn2(atmosphere.heights[ilayer]:atmosphere.heights[ilayer+1]), atmosphere.heights[ilayer]:atmosphere.heights[ilayer+1], ζ=z, λ=atmosphere.λ[1]) 
+        end
         p = Progress(nλ, desc="Generating & propagating atmospheric layers")
         Threads.@threads for l = 1:nλ
-            atmosphere.r0[:,l] = (0.423 * (k[l].^2) * (cos(z)^-1) * atmosphere.Cn2 .* del_z).^(-3/5); 
             for ilayer = 1:nlayers
+                atmosphere.r0[ilayer,l] =  atmosphere.r0[ilayer,1]*(atmosphere.λ[l]/atmosphere.λ[1])^(6/5)
                 atmosphere.phase_screens[:,:,ilayer,l] = ft_phase_screen(atmosphere.r0[ilayer,l], Nscreen_double, δ[ilayer], atmosphere.L0[ilayer], atmosphere.l0[ilayer],seeds[ilayer]);
             end            
             U = ang_spec_multi_prop(Utop, cis.(@views atmosphere.phase_screens[:,:,:,l]), ρ.^2, sg, atmosphere.λ[l], δ1, δn, atmosphere.heights[2:end]);
@@ -216,16 +219,13 @@ end
         δn= FTYPE(4*D/Nscreen); #3.52e-3; #observation-plane grid spacing [m]
         alpha = atmosphere.heights / atmosphere.heights[nlayers];
         δ = ( (FTYPE(1.0) .-alpha)*δ1+(alpha*δn) );
-        λavg= mean(atmosphere.λ)
         p = Progress(nλ, desc="Generating & compositing atmospheric layers")
+        for ilayer = 1:nlayers
+            atmosphere.r0[ilayer,1] = cn2_profile_to_r0(atmosphere.Cn2(atmosphere.heights[ilayer]:atmosphere.heights[ilayer+1]), atmosphere.heights[ilayer]:atmosphere.heights[ilayer+1], ζ=z, λ=atmosphere.λ[1]) 
+        end
         Threads.@threads for l = 1:nλ
-            if r0avg != -1
-                    atmosphere.r0[:,l]  .= r0avg*(atmosphere.λ[l]/λavg).^(6/5)
-                else
-                    del_z = atmosphere.heights[nlayers]-atmosphere.heights[nlayers-1]; # Fix this for nlayers = 1
-                    atmosphere.r0[:,l] = (0.423 * (k[l].^2) * (cos(z)^-1) * atmosphere.Cn2 * del_z).^(-3/5); 
-            end
             for ilayer = 1:nlayers
+                atmosphere.r0[ilayer,l] =  atmosphere.r0[ilayer,1]*(atmosphere.λ[l]/atmosphere.λ[1])^(6/5)
                 atmosphere.phase_screens[:,:,ilayer,l] = ft_phase_screen(atmosphere.r0[ilayer,l], Nscreen, δ[ilayer], atmosphere.L0[ilayer], atmosphere.l0[ilayer],seeds[ilayer]);
             end
             atmosphere.composite_phase[:,:,l] = dropdims(sum(atmosphere.phase_screens[:,:,:,l], dims=3),dims=3);

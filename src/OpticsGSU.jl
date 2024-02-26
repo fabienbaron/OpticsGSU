@@ -19,7 +19,7 @@ export zernike, circular_aperture
 export generate_aperture_chromatic_steps
 export ft_phase_screen,ang_spec_multi_prop, ft_sh_phase_screen, generate_aperture, generate_aperture_with_obscuration, generate_pupil, generate_pupil_all_frames
 export pupil_to_psf, create_images, generate_phase_screens
-export CN2_huffnagel_valley_generalized
+export CN2_huffnagel_valley_generalized, cn2_profile_to_r0, cn2_profile_to_θ0
 export ftn2, iftn2
 export generate_isoplanatic_data, generate_hyperspectral_object, generate_binary
 export generate_tel_aperture_chromatic_steps
