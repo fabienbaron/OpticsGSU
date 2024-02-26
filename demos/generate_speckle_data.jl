@@ -71,7 +71,12 @@ writefits(psf_broad, "psfs.fits")
 writefits(data, "data.fits")
 
 
-
+function shift(x) #note: this takes a 2D array
+  c=findmax(x)[2]
+  Δ=[div(size(x,1),2)+1, div(size(x,2),2)+1]-[c[1],c[2]]
+return circshift(x,round.(Δ))
+end
+    
 
 
 
