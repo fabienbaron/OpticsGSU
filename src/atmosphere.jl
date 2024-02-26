@@ -210,7 +210,7 @@ end
     else # No propagation
         Nscreen = atmosphere.N        # phase screen internal generation size
         atmosphere.phase_screens    = Array{FTYPE}(undef, Nscreen, Nscreen, nlayers, nλ); # We will need 4x larger if we propagate
-        atmosphere.composite_amplitude  = Array{FTYPE}(undef, Nscreen, Nscreen, nλ);
+        atmosphere.composite_amplitude  = ones(FTYPE, Nscreen, Nscreen, nλ);
         atmosphere.composite_phase      = Array{FTYPE}(undef, Nscreen, Nscreen, nλ);
         δ1= FTYPE(4*D/Nscreen); #3.52e-3; #source-plane grid spacing [m]
         δn= FTYPE(4*D/Nscreen); #3.52e-3; #observation-plane grid spacing [m]

@@ -15,7 +15,7 @@ println("Nyquist pixel scale = ", resolution," [arcsec]")
 #
 # DETECTOR SETUP
 #
-nframes = 100 # Number of frames
+nframes = 10 # Number of frames
 exptime=10e-3; # exposure time for each frame
 timestamps = (0:nframes-1)*exptime 
 detector = Detector(true, true, UInt16, .60, 1.0, 2^12-1, 2.0, exptime)
@@ -47,10 +47,10 @@ object_sampling = copy(pixscale)
 # ATMOSPHERE 
 #
 z = 17/360.0*2*pi;            # observation: angular distance from zenith [radians]
-elevation = 2400.0; # observation: elevation
+elevation = 2400; # observation: elevation
 nlayers = 3; # number of atmospheric layers
 Dz = 30e3;        # propagation distance/elevation highest layer [m]
-winds = Float32.([  1.0 45.0 ; 2.0 -80.0; 1.0 25])     # (m/s, deg) 0deg = East, increases clockwise
+winds = Float32.([  10.0 45.0 ; 5.0 -30; 3.0 25 ])     # (m/s, deg) 0deg = East, increases clockwise
 l0 = collect(range(3e-3,3e-2,length=nlayers));
 L0 = collect(range(10,2000,length=nlayers));
 layer_heights=elevation .+ [0; [1:nlayers-1;] * Dz  / (nlayers-1)];
