@@ -177,7 +177,7 @@ function instantiate_polychromatic_atmosphere(atmosphere::Atmosphere, D, z) # D 
            atmosphere.phase_screens[:,:,ilayer,l] = ft_phase_screen(atmosphere.r0[ilayer,l], N, delta[ilayer], atmosphere.L0[ilayer], atmosphere.l0[ilayer],seeds[ilayer]);
         end
         U = ones(N, N); # Amplitude at the top of the atmosphere
-        U = ang_spec_multi_prop(U, sg.*cis.(@views atmosphere.phase_screens[:,:,:,l]), atmosphere.λ[l], delta1, deltan, atmosphere.heights[2:end]);
+        U = ang_spec_multi_prop(U, sg.*cis.(atmosphere.phase_screens[:,:,:,l]), atmosphere.λ[l], delta1, deltan, atmosphere.heights[2:end]);
         lo = div(N-N_final,2)+1
         hi = div(N+N_final,2)
         atmosphere.composite_amplitude[:,:,l] = abs.(U[lo:hi,lo:hi]);

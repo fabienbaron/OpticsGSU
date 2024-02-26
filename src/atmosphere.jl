@@ -126,7 +126,7 @@ function ft_phase_screen(r0, N, δ, L0, l0, seed; FTYPE=Float32)
 	 # Creates a phase screen based on the FT method
 	 # Setup the PSD
 	 del_f = 1/(N*δ);		    # Frequency grid space [1/m]
-	 # Fequency grid [1/m]
+	 # Frequency grid [1/m]
 	 fx, fy = meshgrid([-N/2:N/2-1;]*del_f);
 	 f = sqrt.(fx.^2 + fy.^2);
 	 fm = 5.92/l0/(2*π);		# Inner scale frequency		# Use of 'π'
