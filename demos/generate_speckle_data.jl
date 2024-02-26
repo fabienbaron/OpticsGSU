@@ -16,9 +16,9 @@ println("Nyquist pixel scale = ", resolution," [arcsec]")
 # DETECTOR SETUP
 #
 nframes = 10 # Number of frames
-exptime=10e-3; # exposure time for each frame
+exptime = 10e-3; # exposure time for each frame
 timestamps = (0:nframes-1)*exptime 
-detector = Detector(true, true, UInt16, .60, 1.0, 2^12-1, 2.0, exptime)
+detector = Detector(true, true, UInt16, .60, 1.0, 2^16-1, 2.0, exptime)
 #poisson::Bool, adu::Bool, aduTYPE::DataType, qe::Array{Float32,1}, gain::Float32, saturation::Int32,σ_ron::Float32, exptime::Float32 
 
 #
@@ -33,7 +33,7 @@ nwavs = length(λ);
 #
 
 #object, abundances, spectra = generate_hyperspectral_object(N, λ, template= "./data/sat_template2.fits");
-object, ~, ~ = generate_hyperspectral_object(N, λ, template= "/home/baron/SOFTWARE/OpticsGSU/demos/data/sat_template2.fits");
+object, ~, ~ = generate_hyperspectral_object(N, λ, template= "./demos/data/sat_template2.fits");
 mag1 = 4
 f1 = flux(mag1, tel_surf=pi*(D/2)^2, airmass = 1.0, exptime=detector.exptime);
 #indx_λV=findall(abs.(λ.-540e-9).<89e-9); # Using a rough definition of V
@@ -67,6 +67,8 @@ println("Saving file as: $savefile")
 jldsave(savefile; λ,  timestamps, I, aperture_mask, data, psf_broad, otfs, pupil_amps, pupil_phases, detector, object, FTobject, atmosphere)
 
 
+writefits(psf_broad, "psfs.fits")
+writefits(data, "data.fits")
 
 
 

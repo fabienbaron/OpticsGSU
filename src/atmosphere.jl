@@ -69,7 +69,7 @@ end
 	# δ1 = grid sampling for first layer 
 	# δn = grid sampling for last layer
 	# Function for simulating scintillation through the atmosphere
-    # TEST Uin = U; t=cis.(atmosphere.phase_screens[:,:,:,l]); λ0 = atmosphere.λ[l]; heights = atmosphere.heights; ρ2=ρ.^2
+    # TEST Uin = ones() ; t=cis.(atmosphere.phase_screens[:,:,:,l]); λ0 = atmosphere.λ[l]; heights = atmosphere.heights; ρ2=ρ.^2
     N = size(Uin, 1); # Number of side grid points
     n = length(heights);
     k = 2*π/λ0;    # Optical wavevector
@@ -111,7 +111,7 @@ function ft_scint_screen(r0, N, δ, L0, l0, h=5000.0, λ=0.5e-6)
      Cn2 = 7.53e12   # Calculated using values in Sedmak 2004 using h = 5000m
 	 # Modified von Karman atmospheric scint PSD from Sedmak 2004 - Eqn. 10 (unfiltered).
      # Assuming single layer at h
-     # This version is different to that in the course notes
+     # This version is different from the course notes
      PSD_sci = 1.54 * λ^(-2) * f.^(-11/3) * Cn2 * (sin.(π*λ*h*f.^2)).^2;
      PSD_sci[div(N,2)+1, div(N,2)+1] = 0;
 	 # Random draws of Fourier coefficients
@@ -186,10 +186,10 @@ end
         lo = div(Nscreen_double-Nscreen,2)+1
         hi = div(Nscreen_double+Nscreen,2)
         #########grid spacings#########
-        del_z = atmosphere.heights[nlayers]-atmosphere.heights[nlayers-1]; # Fix this for nlayers = 1
+        del_z = atmosphere.heights[nlayers+1]-atmosphere.heights[nlayers];
         δ1= FTYPE(4*D/Nscreen_double); #3.52e-3; #source-plane grid spacing [m]
         δn= FTYPE(4*D/Nscreen_double); #3.52e-3; #observation-plane grid spacing [m]
-        alpha = atmosphere.heights / atmosphere.heights[nlayers];
+        alpha = atmosphere.heights / atmosphere.heights[nlayers+1];
         δ = ( (FTYPE(1.0) .-alpha)*δ1+(alpha*δn) );
         # Big matrices for propagation
         ρ = meshrad([-Nscreen:Nscreen-1;] * δ1);
@@ -204,7 +204,7 @@ end
                 atmosphere.r0[ilayer,l] =  atmosphere.r0[ilayer,1]*(atmosphere.λ[l]/atmosphere.λ[1])^(6/5)
                 atmosphere.phase_screens[:,:,ilayer,l] = ft_phase_screen(atmosphere.r0[ilayer,l], Nscreen_double, δ[ilayer], atmosphere.L0[ilayer], atmosphere.l0[ilayer],seeds[ilayer]);
             end            
-            U = ang_spec_multi_prop(Utop, cis.(@views atmosphere.phase_screens[:,:,:,l]), ρ.^2, sg, atmosphere.λ[l], δ1, δn, atmosphere.heights[2:end]);
+            U = ang_spec_multi_prop(Utop, cis.(atmosphere.phase_screens[:,:,:,l]), ρ.^2, sg, atmosphere.λ[l], δ1, δn, atmosphere.heights[1:end-1]);
             atmosphere.composite_amplitude[:,:,l] = abs.(U[lo:hi,lo:hi]);
             atmosphere.composite_phase[:,:,l]     = angle.(U[lo:hi,lo:hi]);
             next!(p)
