@@ -59,11 +59,11 @@ atmosphere = instantiate_atmosphere(atmosphere, D, z, verbose = true, propagate=
 I = generate_isoplanatic_frozen_flow_phase_extractors(atmosphere, timestamps, N, object_distance, pixscale);
 
 #Note: by default generate_isoplanatic_data creates broadband data
-data, psf_broad, otfs, pupil_amps, pupil_phases = generate_isoplanatic_data(timestamps, λ, I, FTobject, aperture_mask, atmosphere, detector, disperse = false, λref_disp = 500e-9, zenith = z, pixscale = pixscale);
+data, psfs, otfs, pupil_amps, pupil_phases = generate_isoplanatic_data(timestamps, λ, I, FTobject, aperture_mask, atmosphere, detector, disperse = false, λref_disp = 500e-9, zenith = z, pixscale = pixscale);
 
 savefile= "speckle_sat_n"*string(N)*"_nframes"*string(nframes)*"_nλ"*string(length(λ))*"_mag"*string(mag1)*"_great.jld2"
 println("Saving file as: $savefile")
-jldsave(savefile; λ,  timestamps, I, aperture_mask, data, psf_broad, otfs, pupil_amps, pupil_phases, detector, object, FTobject, atmosphere)
+jldsave(savefile; λ,  timestamps, I, aperture_mask, data, psfs, otfs, pupil_amps, pupil_phases, detector, object, FTobject, atmosphere)
 
 writefits(psf_broad, "psfs.fits")
 writefits(data, "data.fits")
