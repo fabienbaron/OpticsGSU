@@ -8,17 +8,17 @@ pixscale = D/(N/2)
 
 # min and max observing wavelengths [m]
 λmin=400.0e-9
-λmax=1000.0e-9
+λmax=500.0e-9
 resolution = 0.25*λmin/D*1e6/2.0 # assuming Nyquist sampling of pupil at 400 nm
 println("Nyquist pixel scale = ", resolution," [arcsec]")
 
 #
 # DETECTOR SETUP
 #
-nframes = 100 # Number of frames
-exptime = 10e-3; # exposure time for each frame
+nframes = 1000 # Number of frames
+exptime = 5e-3; # exposure time for each frame
 timestamps = (0:nframes-1)*exptime 
-detector = Detector(true, true, UInt16, .60, 1.0, 2^16-1, 2.0, exptime)
+detector = Detector(true, true, UInt16, 1.0, 1.0, 2^16-1, 2.0, exptime)
 #poisson::Bool, adu::Bool, aduTYPE::DataType, qe::Array{Float32,1}, gain::Float32, saturation::Int32,σ_ron::Float32, exptime::Float32 
 
 #
@@ -27,6 +27,7 @@ detector = Detector(true, true, UInt16, .60, 1.0, 2^16-1, 2.0, exptime)
 aperture_mask, λ = generate_aperture_chromatic_steps(N, λmin, λmax, delta_slice=2)
 nwavs = length(λ);
 
+# reverse so λ increasing?
 
 #
 # OBJECT SETUP
@@ -34,11 +35,10 @@ nwavs = length(λ);
 
 #object, abundances, spectra = generate_hyperspectral_object(N, λ, template= "./data/sat_template2.fits");
 object, ~, ~ = generate_hyperspectral_object(N, λ, template= "./data/sat_template2.fits");
+z = 17/360.0*2*pi;            # observation: angular distance from zenith [radians]
 mag1 = 4
 f1 = flux(mag1, tel_surf=pi*(D/2)^2, airmass = 1.0, exptime=detector.exptime);
-#indx_λV=findall(abs.(λ.-540e-9).<89e-9); # Using a rough definition of V
-#object *= f1/sum(object[:,:,indx_λV]); # Flux scaling
-object *= f1/sum(object);
+object *= f1 / sum(object)
 FTobject = object_to_fto(object);
 object_distance = 35786e3 # [m] - closest distance to object
 object_sampling = copy(pixscale)
@@ -46,10 +46,9 @@ object_sampling = copy(pixscale)
 #
 # ATMOSPHERE 
 #
-z = 17/360.0*2*pi;            # observation: angular distance from zenith [radians]
 elevation = 2400; # observation: elevation
 nlayers = 3; # number of atmospheric layers
-winds = Float32.([  10.0 45.0 ; 5.0 -30; 3.0 25 ])     # (m/s, deg) 0deg = East, increases clockwise
+winds = Float32.([  4.6 45.0 ; 5.0 -30; 3.1 25 ])     # (m/s, deg) 0deg = East, increases clockwise
 l0 = collect(range(3e-3,3e-2,length=nlayers));
 L0 = collect(range(10,2000,length=nlayers));
 layer_heights = elevation .+ [0, 10000, 30000, 40000]; 
@@ -66,19 +65,15 @@ savefile= "speckle_sat_n"*string(N)*"_nframes"*string(nframes)*"_nλ"*string(len
 println("Saving file as: $savefile")
 jldsave(savefile; λ,  timestamps, I, aperture_mask, data, psf_broad, otfs, pupil_amps, pupil_phases, detector, object, FTobject, atmosphere)
 
-
 writefits(psf_broad, "psfs.fits")
 writefits(data, "data.fits")
 
 
-function shift(x) #note: this takes a 2D array
-  c=findmax(x)[2]
-  Δ=[div(size(x,1),2)+1, div(size(x,2),2)+1]-[c[1],c[2]]
-return circshift(x,round.(Δ))
-end
-    
 
+data=readfits("data.fits")
 
+shift_img = shift_and_add(Float64.(data))
+imview(shift_img)
 
 
 

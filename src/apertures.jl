@@ -35,7 +35,7 @@ function generate_aperture_chromatic_steps(N, λmin, λmax; delta_slice = 1)
         aperture_mask[:,:,k]= generate_aperture(2*rad[k], 0, N, 1.0)
         println("rad = ",rad[k], " λ = ",λ[k])
     end
-    return aperture_mask, λ;
+    return reverse(aperture_mask, dims=3), reverse(λ);
 end
 
 @views function generate_anisoplanatic_frozen_flow_phase_extractors(atmosphere, timestamps, patches, N, source_height, pupil_sampling, source_sampling; T=Float32)

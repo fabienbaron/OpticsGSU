@@ -33,7 +33,7 @@ export loglikelihood_object, loglikelihood_phases, loglikelihood_object_f, logli
 export flux, mag_zeropoint
 export object_to_fto, convolve_classic, crop_to, phase_to_dr0
 # Util
-export cog, posmax, recenter, bartlett_hann1d, bartlett_hann1d_centered, bartlett_hann2d, gaussian2d, meshgrid, meshrad, meshpol, cart2pol
+export cog, posmax, entropy, shift_and_add, recenter, bartlett_hann1d, bartlett_hann1d_centered, bartlett_hann2d, gaussian2d, meshgrid, meshrad, meshpol, cart2pol
 export set_fourier_plans, convolve_planned, correlate_planned
 # Poisson
 export add_poisson_noise, poisson_likelihood_image
