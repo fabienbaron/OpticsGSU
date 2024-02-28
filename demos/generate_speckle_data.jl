@@ -48,7 +48,7 @@ object_sampling = copy(pixscale)
 #
 elevation = 2400; # observation: elevation
 nlayers = 3; # number of atmospheric layers
-winds = Float32.([  4.6 45.0 ; 5.0 -30; 3.1 25 ])     # (m/s, deg) 0deg = East, increases clockwise
+winds = Float32.([  5.6 45.0 ; 8.0 -30; 7.1 25 ])     # (m/s, deg) 0deg = East, increases clockwise
 l0 = collect(range(3e-3,3e-2,length=nlayers));
 L0 = collect(range(10,2000,length=nlayers));
 layer_heights = elevation .+ [0, 10000, 30000, 40000]; 
@@ -65,18 +65,24 @@ savefile= "speckle_sat_n"*string(N)*"_nframes"*string(nframes)*"_nλ"*string(len
 println("Saving file as: $savefile")
 jldsave(savefile; λ,  timestamps, I, aperture_mask, data, psfs, otfs, pupil_amps, pupil_phases, detector, object, FTobject, atmosphere)
 
-writefits(psf_broad, "psfs.fits")
+writefits(psfs "psfs.fits")
 writefits(data, "data.fits")
 
 
 
-data=readfits("data.fits")
+data=Float64.(readfits("data.fits"))
 
-shift_img = shift_and_add(Float64.(data))
+shift_img = shift_and_add(data)
 imview(shift_img)
 
+pow_data = cat([abs2.(ft2(data[:,:,i])) for i=1:size(data,3)]..., dims=3)
 
 
+psfs=readfits("psfs.fits")
+
+pow_psfs = cat([abs2.(ft2(psfs[:,:,i])) for i=1:size(data,3)]..., dims=3)
 
 
-
+entropies=[entropy(data[:,:,i]) for i=1:1000]
+findmax(entropies)
+findmin(entropies)

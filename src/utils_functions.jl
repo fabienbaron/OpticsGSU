@@ -1,3 +1,4 @@
+using Statistics
 # Centering functions
 function cog(x) #note: this takes a 2D array
     xvals = [i for i = 1:size(x, 1)]
@@ -15,7 +16,7 @@ function recenter(x, center) #note: this takes a 2D array
 end
 
 function shift_and_add(cube)
-    return reduce(+, [recenter(cube[:, :, i], posmax(cube[:, :, i])) for i = 1:size(cube, 3)])
+    return mean([recenter(cube[:, :, i], posmax(cube[:, :, i])) for i = 1:size(cube, 3)])
 end
 
 function entropy(x)
