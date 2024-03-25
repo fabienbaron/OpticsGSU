@@ -74,14 +74,9 @@ data=Float64.(readfits("data.fits"))
 
 shift_img = shift_and_add(data)
 imview(shift_img)
-
 pow_data = cat([abs2.(ft2(data[:,:,i])) for i=1:size(data,3)]..., dims=3)
-
-
 psfs=readfits("psfs.fits")
-
 pow_psfs = cat([abs2.(ft2(psfs[:,:,i])) for i=1:size(data,3)]..., dims=3)
-
 
 entropies=[entropy(data[:,:,i]) for i=1:1000]
 findmax(entropies)
