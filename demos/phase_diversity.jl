@@ -9,16 +9,18 @@ using LinearAlgebra
 o =rotl90(readfits("./data/jupiter.fits")*1.0)
 N = size(o,1)
 # PSF1 & PSF2 (defocus)
-amplitude = circular_aperture(npix=N, diameter=N/4, centered=true)#-circular_aperture(npix=N, diameter=N/4, centered=true);
+amplitude = circular_aperture(npix=N, diameter=N/4, centered=true)
+amplitude = amplitude/norm(amplitude)
+
 phase = -10*zernike(5, npix=N, diameter=N/4)+17*zernike(7, npix=N, diameter=N/4) 
 pupil1 = amplitude.*exp.(im*phase)
-PSF1 = abs2.(ift2(pupil1))
-image1 = convolve(o, PSF1)
+PSF1 = abs2.(ift2(pupil1)*N)
+image1 = convolve(o, PSF1) + randn(N,N)
 
 diversity = 40*zernike(4, npix=N, diameter=N/4)
 pupil2 = amplitude.*exp.(im*(phase+diversity))
-PSF2 = abs2.(ift2(pupil2))
-image2 = convolve(o, PSF2)
+PSF2 = abs2.(ift2(pupil2)*N)
+image2 = convolve(o, PSF2) + randn(N,N)
 
 #
 # Reconstruct
@@ -35,7 +37,7 @@ image2 = convolve(o, PSF2)
 #psf1 = abs2.(ift2(amplitude.*exp.(im*phase)))
 #psf2 = abs2.(ift2(amplitude.*exp.(im*(phase+diversity)))
 
-ϵ(o, phase) = (o,phase) -> norm(image1 - convolve(o, abs2.(ift2(amplitude.*exp.(im*phase)))))^2 + norm(image2 - convolve(o, abs2.(ift2(amplitude.*exp.(im*(phase+diversity))))))^2
+f = (o,phase) -> norm(image1 - convolve(o, abs2.(ift2(amplitude.*exp.(im*phase)))))^2 + norm(image2 - convolve(o, abs2.(ift2(amplitude.*exp.(im*(phase+diversity))))))^2
 
 using Zygote #automatic differentiation
 
