@@ -51,23 +51,22 @@ g_o = zeros(N,N)
 
 ϕ = copy(phase)
 function fg(x, g_o)
-    f1 = 0.5*norm((image1 - convolve(x, abs2.(ift2(N*amplitude.*exp.(im*ϕ)))))/σ)^2/(N*N) 
-    f2 = 0.5*norm((image2 - convolve(x, abs2.(ift2(N*amplitude.*exp.(im*(ϕ+diversity))))))/σ)^2/(N*N)
     pupil1 = amplitude.*exp.(im*ϕ)
     PSF1 = abs2.(ift2(pupil1)*N)
     pupil2 = amplitude.*exp.(im*(ϕ+diversity))
     PSF2 = abs2.(ift2(pupil2)*N)
     R1 = (image1 - convolve(x, PSF1))/σ 
     R2 = (image2 - convolve(x, PSF2))/σ 
-    g_o[:] = -2*correlate(R1,PSF1) -2*correlate(R2,PSF2)
+    f1 = 0.5*norm(R1)^2/(N*N) 
+    f2 = 0.5*norm(R2)^2/(N*N)
+    g_o[:] = -1/(N*N)*(correlate(R1,PSF1) + correlate(R2,PSF2))
     return f1+f2
 end
 
-fg(o_start, phase_start, g_o)
+fg(o_start, g_o)
 
 using OptimPackNextGen
-
-x = vmlmb(fg, o_start, lower=0)
+x = vmlmb(fg, o_start, lower=0, maxiter=1000, verb=true)
 
 
 #
