@@ -34,7 +34,7 @@ image2 = convolve(o, PSF2) + σ*randn(N,N)
 
 f = (x,ϕ) -> 0.5*norm((image1 - convolve(x, abs2.(ift2(N*amplitude.*exp.(im*ϕ)))))/σ)^2/(N*N) + 0.5*norm((image2 - convolve(x, abs2.(ift2(N*amplitude.*exp.(im*(ϕ+diversity))))))/σ)^2/(N*N)
 
-
+f(o,phase)
 # Residual
 
 # Gradients
@@ -46,18 +46,28 @@ o_start = o_start.*(o_start.>0)
 phase_start = zeros(N,N)
 f(o_start, phase_start)
 
+g_o = zeros(N,N)
 
 
+function fg(x, ϕ, g_o)
+    f1 = 0.5*norm((image1 - convolve(x, abs2.(ift2(N*amplitude.*exp.(im*ϕ)))))/σ)^2/(N*N) 
+    f2 = 0.5*norm((image2 - convolve(x, abs2.(ift2(N*amplitude.*exp.(im*(ϕ+diversity))))))/σ)^2/(N*N)
+    pupil1 = amplitude.*exp.(im*ϕ)
+    PSF1 = abs2.(ift2(pupil1)*N)
+    pupil2 = amplitude.*exp.(im*(ϕ+diversity))
+    PSF2 = abs2.(ift2(pupil2)*N)
+    R1 = (image1 - convolve(x, PSF1))/σ 
+    R2 = (image2 - convolve(x, PSF2))/σ 
+    g_o[:] = -2*correlate(R1,PSF1) -2*correlate(R2,PSF2)
+    return f1+f2
+end
 
-using Zygote #automatic differentiation
+fg(o_start, phase_start, g_o)
 
-gradient(ϵ, o)
+using OptimPackNextGen
 
+x = vmlmb(fg, o_start, lower=0)
 
-
-
-
-#using OptimPackNextGen
 
 #
 # Comparison
