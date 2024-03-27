@@ -1,5 +1,6 @@
 using OpticsGSU
 using Statistics
+using LinearAlgebra
 #
 # Simulate
 #
@@ -34,8 +35,7 @@ image2 = convolve(o, PSF2)
 #psf1 = abs2.(ift2(amplitude.*exp.(im*phase)))
 #psf2 = abs2.(ift2(amplitude.*exp.(im*(phase+diversity)))
 
-ϵ(o, phase) = (o,phase) -> norm(image1 - convolve(o, abs2.(ift2(amplitude.*exp.(im*phase)))))^2 
-            + norm(image2 - convolve(o, abs2.(ift2(amplitude.*exp.(im*(phase+diversity)))))^2
+ϵ(o, phase) = (o,phase) -> norm(image1 - convolve(o, abs2.(ift2(amplitude.*exp.(im*phase)))))^2 + norm(image2 - convolve(o, abs2.(ift2(amplitude.*exp.(im*(phase+diversity))))))^2
 
 using Zygote #automatic differentiation
 
