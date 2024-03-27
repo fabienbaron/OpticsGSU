@@ -49,7 +49,8 @@ f(o_start, phase_start)
 g_o = zeros(N,N)
 
 
-function fg(x, ϕ, g_o)
+ϕ = copy(phase)
+function fg(x, g_o)
     f1 = 0.5*norm((image1 - convolve(x, abs2.(ift2(N*amplitude.*exp.(im*ϕ)))))/σ)^2/(N*N) 
     f2 = 0.5*norm((image2 - convolve(x, abs2.(ift2(N*amplitude.*exp.(im*(ϕ+diversity))))))/σ)^2/(N*N)
     pupil1 = amplitude.*exp.(im*ϕ)
