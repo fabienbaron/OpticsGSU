@@ -5,6 +5,7 @@ using LinearAlgebra
 # Simulate
 #
 
+
 # Object
 o =rotl90(readfits("./data/jupiter.fits")*1.0)
 N = size(o,1)
@@ -15,12 +16,13 @@ amplitude = amplitude/norm(amplitude)
 phase = -10*zernike(5, npix=N, diameter=N/4)+17*zernike(7, npix=N, diameter=N/4) 
 pupil1 = amplitude.*exp.(im*phase)
 PSF1 = abs2.(ift2(pupil1)*N)
-image1 = convolve(o, PSF1) + randn(N,N)
+σ = 5.0
+image1 = convolve(o, PSF1) + σ*randn(N,N)
 
 diversity = 40*zernike(4, npix=N, diameter=N/4)
 pupil2 = amplitude.*exp.(im*(phase+diversity))
 PSF2 = abs2.(ift2(pupil2)*N)
-image2 = convolve(o, PSF2) + randn(N,N)
+image2 = convolve(o, PSF2) + σ*randn(N,N)
 
 #
 # Reconstruct
@@ -30,18 +32,29 @@ image2 = convolve(o, PSF2) + randn(N,N)
 #           and phase on PSF1... ? zero
 
 
+f = (x,ϕ) -> 0.5*norm((image1 - convolve(x, abs2.(ift2(N*amplitude.*exp.(im*ϕ)))))/σ)^2/(N*N) + 0.5*norm((image2 - convolve(x, abs2.(ift2(N*amplitude.*exp.(im*(ϕ+diversity))))))/σ)^2/(N*N)
+
+
 # Residual
 
 # Gradients
 
 #psf1 = abs2.(ift2(amplitude.*exp.(im*phase)))
 #psf2 = abs2.(ift2(amplitude.*exp.(im*(phase+diversity)))
+o_start = (image1+image2)/2
+o_start = o_start.*(o_start.>0)
+phase_start = zeros(N,N)
+f(o_start, phase_start)
 
-f = (o,phase) -> norm(image1 - convolve(o, abs2.(ift2(amplitude.*exp.(im*phase)))))^2 + norm(image2 - convolve(o, abs2.(ift2(amplitude.*exp.(im*(phase+diversity))))))^2
+
+
 
 using Zygote #automatic differentiation
 
 gradient(ϵ, o)
+
+
+
 
 
 #using OptimPackNextGen
