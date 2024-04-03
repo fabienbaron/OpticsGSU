@@ -8,7 +8,7 @@ pixscale = D/(N/2)
 
 # min and max observing wavelengths [m]
 λmin=400.0e-9
-λmax=500.0e-9
+λmax=1000.0e-9
 resolution = 0.25*λmin/D*1e6/2.0 # assuming Nyquist sampling of pupil at 400 nm
 println("Nyquist pixel scale = ", resolution," [arcsec]")
 

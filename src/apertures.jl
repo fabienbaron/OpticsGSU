@@ -17,8 +17,8 @@ end
 
 function generate_aperture_chromatic_steps(N, λmin, λmax; delta_slice = 1) 
     # generates a telescope aperture for multiwav use
-    rad_max = div(N, 4)
-    rad_min = ceil(Int, rad_max*(λmin/λmax))
+    rad_max = div(N, 4) # for D/λmin
+    rad_min = ceil(Int, rad_max*(λmin/λmax)) 
     nwavs = round(Int, (rad_max - rad_min)/delta_slice)+1
     rad_min = rad_max - nwavs*delta_slice+delta_slice
     rad = zeros(Float32, nwavs);
