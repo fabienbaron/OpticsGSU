@@ -82,3 +82,29 @@ end
 end
 
 
+@views function generate_liom_data(offsets, t, λ, I, aperture_mask, atmosphere, detector::Detector; zenith = 0,  pixscale = 1e99, disperse = false, λref_disp = 500e-9, FTYPE=Float32, CTYPE=ComplexF32)
+   # Note: λref_disp is the reference wavelength for zero dispersion
+   # DEBUG: t=timestamps; zenith = z;  disperse= true;  FTYPE=Float32; CTYPE=ComplexF32;λref_disp = 500e-9; noise=true
+   dim       = size(aperture_mask, 1)
+   nwavs     = atmosphere.nλ
+   nframes   = length(t)
+   psf       = zeros(FTYPE, dim, dim, nframes);
+   data       = zeros(FTYPE, dim, dim, nframes); 
+   pupil_phases = extract_composite_phases(atmosphere.phase_screens, I); # Frozen flow model, composite phase = add phases
+   pupil_amps = zeros(FTYPE, dim, dim, nwavs, nframes);
+   θref = 0;
+   if disperse == true
+     θref = get_refraction(λref_disp, zenith);
+   end 
+   p = Progress(nframes, desc="Computing images")
+   Threads.@threads for n=1:nframes
+      for k=1:nwavs
+           data[:,:,n] += abs2.(ift2(aperture_mask[:,:,k].*cis.(offsets[:,:,k,n]+pupil_phases[:,:,k,n]))*dim)
+      end
+       next!(p)
+   end       
+   finish!(p)
+   return data, psfs
+end
+
+

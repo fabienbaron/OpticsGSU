@@ -1,11 +1,14 @@
 using PyPlot
 
-function imview(x;title="",zoom=1, color="gray")
+function imview(x;title="",zoom=1, color="gray", newfig = true)
     if zoom < 1
         zoom = 1
     end
-    fig = figure(title,figsize=(10,10))
-    clf()
+    if newfig == true
+        fig = figure(title,figsize=(10,10))
+        clf()
+    end
+    
     nx = size(x,1)
     ny = size(x,2)
     center_x = div(nx+1,2)
