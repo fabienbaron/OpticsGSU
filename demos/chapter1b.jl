@@ -11,22 +11,22 @@ image = convolve(psf_gaussian, obj);
 imview(image, title="Image");
 
 # Read phase screen
-phase=readfits("./data/Dr03_phases.fits.fz");  # turbulence
+phases=readfits("./data/Dr03_phases.fits.fz");  # turbulence
 α = 2.72219 # scaling factor for phase
-phase *= α
+phases *= α
 aperture=circular_aperture(npix=npix,diameter=npix/2.,centered=true);
-npad = div(max(npix-size(phase,1),0),2); # we may need to pad the phase screen
+npad = div(max(npix-size(phases,1),0),2); # we may need to pad the phase screen
 
 
 # Compute speckle data  - Gaussian Noise
-nframes = size(phase)[3]
+nframes = size(phases)[3]
 image_data_noiseless = zeros(Float64, npix, npix, nframes )
 image_data_noisy = zeros(Float64, npix, npix, nframes )
 psfs = zeros(Float64, npix, npix, nframes )
 otfs = zeros(ComplexF64, npix, npix, nframes )
 σ = 1/10
 for i=1:nframes
-   psfs[:,:,i] = pupil_to_psf(aperture, pad(phase[:,:,i],npad));
+   psfs[:,:,i] = pupil_to_psf(aperture, pad(phases[:,:,i],npad));
    otfs[:,:,i] = ft2(psfs[:,:,i]);
    image_data_noiseless[:,:,i] = convolve(psfs[:,:,i], obj);
    image_data_noisy[:,:,i] = image_data_noiseless[:,:,i] + σ*randn(npix,npix);
@@ -38,7 +38,7 @@ writefits(psfs, "./data/speckle_fake_data_psfs.fits")
 
 
 # Direct inversion on single frame
-psf = pupil_to_psf(aperture, pad(phase[:,:,1],npad));
+psf = pupil_to_psf(aperture, pad(phases[:,:,1],npad));
 
 
 # no noise
