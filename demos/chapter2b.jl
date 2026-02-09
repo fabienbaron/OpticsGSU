@@ -21,11 +21,13 @@ x_init = deepcopy(x_noisy);
 crit = (x,g)->epsilon(x, g, x_noisy, σ, psf);
 x_sol = OptimPackNextGen.vmlmb(crit, x_init, verb=true, lower=0.0, maxiter=2000); # positivity is imposed here
 imview4(x_true, x_conv, x_noisy, x_sol);
-println("μ = $(μ)\t ϵ = $(crit(x_sol, dummy ))\t dist = $(norm(x_sol - x_true,1))\n");
+println("ϵ = $(crit(x_sol, dummy ))\t dist = $(norm(x_sol - x_true,1))\n");
 
 #
-# With another regularization
+# With regularization
 #
+
+
 
 o = ones(npix);
 D_1D = spdiagm(-1=>-o[1:npix-1],0=>o)
@@ -47,3 +49,23 @@ imview4(x_true, x_conv, x_noisy, x_sol);
 println("μ = $(μ)\t ϵ = $(crit(x_sol, dummy ))\t dist = $(norm(x_sol - x_true,1))\n");
 readline();
 #end
+
+
+# Sobel gradient + autodiff
+using Zygote
+N = npix
+c = N÷2+1;
+Gx = zeros(N,N); 
+Gy = zeros(N,N); 
+Gx[c-1:c+1, c-1:c+1] = [ -1 0 1; -2 0 2; -1 0 1]
+Gy[c-1:c+1, c-1:c+1] = [-1 -2 -1; 0 0 0; 1 2 1]
+∇ = X -> hcat(convolve(X, Gx), convolve(X,Gy));
+
+function epsilon_tv(object, g, data, σ, psf, μ)
+    res = (data - convolve(object,psf) ) / σ;
+    x= vec(object);
+    f= sum(res.^2) + μ*norm(∇*x,2)^2; 
+    return f;
+end
+crit = (x,g)->epsilon_tv(x, g, x_noisy, σ, psf, μ);
+x_sol = OptimPackNextGen.vmlmb(crit, x_init, verb=true, autodiff=true, lower=0, maxiter=2000); 

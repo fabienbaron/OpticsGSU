@@ -40,15 +40,14 @@ writefits(psfs, "./data/speckle_fake_data_psfs.fits")
 # Direct inversion on single frame
 psf = pupil_to_psf(aperture, pad(phases[:,:,1],npad));
 
-
 # no noise
 image_spec = convolve(psf, obj) + 0*randn(npix,npix);
-direct_obj=real(fftshift(ifft(fft(image_spec)./(fft(psf).+1.0e-15))))      # adding small number because psf have 0, and we couldn't divided by 0.
+direct_obj=real(fftshift(ifft(fft(image_spec)./(fft(psf).+1.0e-5))))      # adding small number because psf have 0, and we couldn't divided by 0.
 imview2(image_spec, direct_obj, caption1="Speckle image", caption2="Direct Inversion (no noise on data)", figtitle="Direct Inversion")
 
 # A slight amount of noise
-image_spec = convolve(psf, obj) + randn(npix,npix)/10000;
-direct_obj=real(fftshift(ifft(fft(image_spec)./(fft(psf).+1.0e-15))))      # adding small number because psf have 0, and we couldn't divided by 0.
+image_spec = convolve(psf, obj) + randn(npix,npix)/1000;
+direct_obj=real(fftshift(ifft(fft(image_spec)./(fft(psf).+1.0e-5))))      # adding small number because psf have 0, and we couldn't divided by 0.
 imview2(image_spec, direct_obj, caption1="Speckle image", caption2="Direct Inversion", figtitle="Direct Inversion")
 
 
@@ -61,9 +60,9 @@ image_long_exposure = dropdims(sum(image_data_noisy, dims=3), dims=3);
 wiener_numer = zeros(Complex{Float64},npix,npix);
 wiener_denom = zeros(Float64,npix,npix);
 for i=1:500
-   wiener_numer += fft(image_data_noisy[:,:,i]).*conj(otfs[:,:,i]);
-   wiener_denom += abs2.(otfs[:,:,i]) .+ 1e-7;
+   wiener_numer += ft2(image_data_noisy[:,:,i]).*conj(otfs[:,:,i]);
+   wiener_denom += abs2.(otfs[:,:,i]) .+ 1e-15;
 end
-wiener_obj =real(fftshift(ifft(wiener_numer./wiener_denom)));
+wiener_obj =real(ift2(wiener_numer./wiener_denom));
 imview2(image_long_exposure, wiener_obj, caption1="Long exposure image", caption2="Wiener Inversion", figtitle="Wiener Inversion")
 norm(wiener_obj-obj)

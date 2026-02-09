@@ -128,3 +128,41 @@ aperture = ones(size(rho))
 aperture[findall(rho.>1)] .= outside  # this is the aperture mask
 return aperture
 end
+
+
+function proj(u, v)
+    return (dot(v,u)/dot(u,u))*u
+end
+
+function orthonormalize_GramSchmidt(Z) # Orthonormalize given zernikes
+    nZ = size(Z, 3)
+    u = copy(Z)
+    e = copy(Z)
+    e[:,:,1] = Z[:,:,1]/norm(Z[:,:,1])
+    for n=2:nZ
+        u[:,:,n] -= reduce(+, [proj(u[:,:,j], Z[:,:,n]) for j=1:n-1])
+        e[:,:,n] = u[:,:,n]/norm(u[:,:,n]) 
+    end
+    return e
+end
+
+function generate_zernikes(N, diameter, nZ) # Fast Zernike generator
+Z = zeros(Float32, N,N,nZ);
+for i=1:nZ
+    Z[:,:,i] = zernike(i, npix=N, diameter=N÷2, centered=true);
+end
+return Z
+end
+
+
+function test_ortho(Z)
+    nZ = size(Z, 3)
+    map = zeros(nZ, nZ)
+    for i=1:nZ
+        for j=i:nZ
+            map[i,j] = dot(Z[:,:,i],Z[:,:,j])
+            println("$i $j :", map[i,j])
+        end
+    end
+    return map 
+end

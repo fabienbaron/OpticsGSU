@@ -41,8 +41,8 @@ zern3 = zernike(3,npix=npix,diameter=npix,centered=true);
 
 for j = 1:nframes
   a1 = 0. #sum(zern1.*phase[:,:,j])/3.1415926;
-  a2 = sum(zern2.*phase[:,:,j])/pi;
-  a3 = sum(zern3.*phase[:,:,j])/pi;
+  a2 = dot(zern2,phase[:,:,j])/pi;
+  a3 = dot(zern3,phase[:,:,j])/pi;
   phase[:,:,j] =  phase[:,:,j] - (a1*zern1 + a2*zern2 + a3*zern3);
 end
 
