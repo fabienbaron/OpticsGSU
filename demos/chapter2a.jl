@@ -29,13 +29,13 @@ wiener_denom = zeros(Complex{Float64},npix,npix);
 images = zeros(Float64, npix, npix, nframes);
 psfs = zeros(Float64, npix, npix, nframes);
 σ=200000
-μ=1e6
+ψ=1e6
 for i=1:nframes
    psfs[:,:,i] = pupil_to_psf(aperture, pad(phase[:,:,i]*5,npad));
    images[:,:,i] = convolve(psf, obj) + σ*randn(Float64, size(obj));
    otf_i = ft2(psfs[:,:,i])
    wiener_numer += ft2(images[:,:,i]).*conj(otf_i)
-   wiener_denom += abs2.(otf_i) .+ μ
+   wiener_denom += abs2.(otf_i) .+  ψ
 end
 wiener_obj =real(ift2(wiener_numer./wiener_denom))
 imview2(images[:,:,123], wiener_obj, caption1="Detector image", caption2="Wiener Inversion", figtitle="Wiener Inversion")
