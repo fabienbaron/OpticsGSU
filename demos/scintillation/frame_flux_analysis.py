@@ -15,16 +15,12 @@ from typing import Optional
 from config import (
     WAVELENGTH,
     EXPOSURE_TIME,
+    HALE_DIAMETER,
     TOTAL_R0_ZENITH,
     photons_per_exposure,
     zenith_correction
 )
-from atmosphere import (
-    LAYER_HEIGHTS,
-    LAYER_R0_ZENITH,
-    LAYER_WIND_SPEEDS,
-    LAYER_WIND_DIRECTIONS,
-)
+from atmosphere import create_frozen_flow_atmosphere
 from telescope import HaleTelescope, create_wavefront
 from camera import SpeckleCamera
 
@@ -36,33 +32,13 @@ def create_atmosphere_with_scintillation(
     seed: Optional[int] = None
 ) -> hp.MultiLayerAtmosphere:
     """Create three-layer atmosphere with scintillation enabled."""
-    if seed is not None:
-        np.random.seed(seed)
-    
-    sec_z = 1.0 / np.cos(np.radians(zenith_angle_deg))
-    layers = []
-    
-    for height, r0_zenith, v_wind, theta_wind in zip(
-            LAYER_HEIGHTS, LAYER_R0_ZENITH, LAYER_WIND_SPEEDS, LAYER_WIND_DIRECTIONS):
-        
-        r0 = zenith_correction(r0_zenith, zenith_angle_deg)
-        velocity = v_wind * np.array([np.cos(theta_wind), np.sin(theta_wind)])
-        eff_height = height * sec_z
-        
-        layer = hp.InfiniteAtmosphericLayer(
-            pupil_grid,
-            Cn_squared=1.0,
-            L0=outer_scale,
-            velocity=velocity,
-            height=eff_height,
-            use_interpolation=True
-        )
-        
-        k = 2 * np.pi / WAVELENGTH
-        layer.Cn_squared = r0**(-5/3) / (0.423 * k**2)
-        layers.append(layer)
-    
-    return hp.MultiLayerAtmosphere(layers, scintillation=True)
+    return create_frozen_flow_atmosphere(
+        pupil_grid,
+        zenith_angle_deg=zenith_angle_deg,
+        outer_scale=outer_scale,
+        scintillation=True,
+        seed=seed
+    )
 
 
 def aperture_photometry(image: hp.Field, aperture_radius_pix: int) -> float:
@@ -114,8 +90,11 @@ def simulate_frame_sequence(
     photons_per_frame = photons_per_exposure(magnitude)
     
     # Aperture: 3 lambda/D
-    pixel_scale = telescope.focal_grid.delta[0]
-    aperture_radius_pix = int(3.0 / pixel_scale)
+    # With physical units: focal_grid.delta is in radians
+    lambda_over_D = WAVELENGTH / HALE_DIAMETER  # radians
+    pixel_scale_rad = telescope.focal_grid.delta[0]  # radians per pixel
+    pixels_per_lambda_D = lambda_over_D / pixel_scale_rad
+    aperture_radius_pix = int(3.0 * pixels_per_lambda_D)
     
     # Get image dimensions
     sample_img = telescope.reference_psf.shaped

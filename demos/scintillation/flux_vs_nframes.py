@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from config import (
     WAVELENGTH,
     EXPOSURE_TIME,
+    HALE_DIAMETER,
     TOTAL_R0_ZENITH,
     photons_per_exposure,
     zenith_correction
@@ -199,8 +200,12 @@ def run_nframes_analysis(
     )
     
     # Aperture: 3 lambda/D
-    pixel_scale = telescope.focal_grid.delta[0]
-    aperture_radius_pix = int(3.0 / pixel_scale)
+    # Aperture: 3 lambda/D
+    # With physical units: focal_grid.delta is in radians
+    lambda_over_D = WAVELENGTH / HALE_DIAMETER  # radians
+    pixel_scale_rad = telescope.focal_grid.delta[0]  # radians per pixel
+    pixels_per_lambda_D = lambda_over_D / pixel_scale_rad
+    aperture_radius_pix = int(3.0 * pixels_per_lambda_D)
     
     print(f"Aperture radius: {aperture_radius_pix} pixels (~3 λ/D)")
     print(f"Magnitude: {magnitude}")

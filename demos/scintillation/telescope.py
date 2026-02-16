@@ -149,7 +149,7 @@ def create_focal_grid(
     Parameters
     ----------
     pupil_grid : hp.Grid
-        The pupil plane grid (used for reference, not passed to make_focal_grid)
+        The pupil plane grid (in physical units, meters)
     wavelength : float
         Observing wavelength in meters
     q : int
@@ -160,11 +160,17 @@ def create_focal_grid(
     Returns
     -------
     hp.Grid
-        Focal plane grid in normalized (lambda/D) units
+        Focal plane grid in physical units (radians)
     """
-    # For normalized units, just pass q and num_airy
-    # Grid will be in lambda/D units
-    focal_grid = hp.make_focal_grid(q, num_airy)
+    # Use physical units: pupil_diameter, reference_wavelength, focal_length
+    # focal_length=1 means focal plane coordinates are in radians
+    focal_grid = hp.make_focal_grid(
+        q, 
+        num_airy,
+        pupil_diameter=HALE_DIAMETER,
+        reference_wavelength=wavelength,
+        focal_length=1.0
+    )
     return focal_grid
 
 
@@ -179,19 +185,19 @@ def create_propagator(
     Parameters
     ----------
     pupil_grid : hp.Grid
-        Pupil plane grid
+        Pupil plane grid (in meters)
     focal_grid : hp.Grid
-        Focal plane grid
+        Focal plane grid (in radians, with focal_length=1)
     wavelength : float
-        Wavelength in meters (not used when focal_grid is in normalized units)
+        Wavelength in meters (not used directly, but kept for API)
     
     Returns
     -------
     hp.FraunhoferPropagator
         Propagator object
     """
-    # For normalized units (focal_grid in lambda/D), use default focal_length=1
-    propagator = hp.FraunhoferPropagator(pupil_grid, focal_grid)
+    # focal_length=1.0 means focal plane is in radians
+    propagator = hp.FraunhoferPropagator(pupil_grid, focal_grid, focal_length=1.0)
     return propagator
 
 
@@ -357,14 +363,8 @@ class HaleTelescope:
         float
             Plate scale
         """
-        # lambda/D in radians
-        lambda_D = self.wavelength / HALE_DIAMETER
-        
-        # Pixel size in focal plane (in lambda/D units from grid)
-        pixel_size_lambdaD = self.focal_grid.delta[0]
-        
-        # Convert to arcsec
-        pixel_size_rad = pixel_size_lambdaD * lambda_D
+        # With physical units, focal_grid.delta is in radians
+        pixel_size_rad = self.focal_grid.delta[0]
         pixel_size_arcsec = np.degrees(pixel_size_rad) * 3600
         
         return pixel_size_arcsec

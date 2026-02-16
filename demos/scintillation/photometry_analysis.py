@@ -166,8 +166,11 @@ def run_magnitude_sweep(
     )
     
     # Aperture radius: 3 lambda/D
-    pixel_scale = telescope.focal_grid.delta[0]
-    aperture_radius_pix = int(3.0 / pixel_scale)
+    # With physical units: focal_grid.delta is in radians
+    lambda_over_D = WAVELENGTH / HALE_DIAMETER  # radians
+    pixel_scale_rad = telescope.focal_grid.delta[0]  # radians per pixel
+    pixels_per_lambda_D = lambda_over_D / pixel_scale_rad
+    aperture_radius_pix = int(3.0 * pixels_per_lambda_D)
     
     print(f"Aperture radius: {aperture_radius_pix} pixels (~3 λ/D)")
     print(f"Frames per stack: {num_frames}")

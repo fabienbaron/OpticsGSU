@@ -172,15 +172,44 @@ def zenith_correction(r0_zenith: float, zenith_angle_deg: float) -> float:
 # Three-Layer Atmospheric Model
 # =============================================================================
 
-# Layer heights (meters)
-LAYER_HEIGHTS = [0.0, 1000.0, 3000.0]  # Ground, 1km, 3km
+# Layer heights (meters) and their vertical extents
+# Ground layer: 0-500m
+# Layer 1: 500-2000m (centered at 1km)
+# Layer 2: 2000-5000m (centered at 3km)
+LAYER_HEIGHTS = [0.0, 1000.0, 3000.0]  # Representative heights for each layer
 
-# Layer effective thicknesses for Cn2 integration (meters)
-# These represent the vertical extent each layer captures
-LAYER_THICKNESSES = [500.0, 1000.0, 2000.0]
 
-# Compute Cn2 at each layer height
-LAYER_CN2 = [hufnagel_valley_cn2(h) for h in LAYER_HEIGHTS]
+def compute_layer_integrated_cn2(h_low: float, h_high: float) -> float:
+    """
+    Integrate Cn2 over a layer from h_low to h_high.
+    
+    Parameters
+    ----------
+    h_low : float
+        Lower boundary in meters
+    h_high : float
+        Upper boundary in meters
+    
+    Returns
+    -------
+    float
+        Integrated Cn2 in m^(1/3)
+    """
+    from scipy import integrate
+    integral, _ = integrate.quad(hufnagel_valley_cn2, h_low, h_high)
+    return integral
+
+
+# Layer boundaries for integration
+LAYER_BOUNDS = [(0, 500), (500, 2000), (2000, 5000)]
+
+# Compute integrated Cn2 for each layer
+_LAYER_INTEGRATED_CN2_RAW = [compute_layer_integrated_cn2(lo, hi) for lo, hi in LAYER_BOUNDS]
+
+# Scale factor to simulate better seeing conditions
+# To get r0 10x larger (good seeing ~50cm instead of ~5cm), scale Cn2 by 1/10^(5/3)
+SEEING_SCALE_FACTOR = 10**(-5/3)  # ~0.0215
+LAYER_INTEGRATED_CN2 = [cn2 * SEEING_SCALE_FACTOR for cn2 in _LAYER_INTEGRATED_CN2_RAW]
 
 # Wind velocities based on Bufton wind model (typical for HV-5/7)
 # Ground layer: typically slow
@@ -230,9 +259,11 @@ def compute_layer_r0(layer_idx: int, wavelength: float = WAVELENGTH) -> float:
     float
         r0 for that layer in meters
     """
-    cn2 = LAYER_CN2[layer_idx]
-    dh = LAYER_THICKNESSES[layer_idx]
-    return compute_r0_from_cn2(cn2, dh, wavelength)
+    # LAYER_INTEGRATED_CN2 already contains integral(Cn2 dh) for each layer
+    integrated_cn2 = LAYER_INTEGRATED_CN2[layer_idx]
+    k = 2 * np.pi / wavelength
+    r0 = (0.423 * k**2 * integrated_cn2)**(-3/5)
+    return r0
 
 
 def compute_total_r0(wavelength: float = WAVELENGTH) -> float:
@@ -267,8 +298,8 @@ def get_layer_weights() -> np.ndarray:
     np.ndarray
         Normalized weights summing to 1
     """
-    # Weight by Cn2 * thickness
-    weights = np.array([cn2 * dh for cn2, dh in zip(LAYER_CN2, LAYER_THICKNESSES)])
+    # LAYER_INTEGRATED_CN2 already contains integral(Cn2 dh) for each layer
+    weights = np.array(LAYER_INTEGRATED_CN2)
     return weights / weights.sum()
 
 
