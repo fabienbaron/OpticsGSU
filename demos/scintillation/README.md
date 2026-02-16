@@ -60,6 +60,11 @@ pip install hcipy numpy matplotlib scipy
 ## Usage
 
 ### Command Line
+```bash 
+# Flux analysis
+python frame_flux_analysis.py -m 8 -z 30 -n 100
+```
+
 
 ```bash
 # Basic simulation
