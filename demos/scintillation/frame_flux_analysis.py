@@ -29,7 +29,8 @@ def create_atmosphere_with_scintillation(
     pupil_grid: hp.Grid,
     zenith_angle_deg: float = 0.0,
     outer_scale: float = 25.0,
-    seed: Optional[int] = None
+    seed: Optional[int] = None,
+    r0_total: Optional[float] = None
 ) -> hp.MultiLayerAtmosphere:
     """Create three-layer atmosphere with scintillation enabled."""
     return create_frozen_flow_atmosphere(
@@ -37,7 +38,8 @@ def create_atmosphere_with_scintillation(
         zenith_angle_deg=zenith_angle_deg,
         outer_scale=outer_scale,
         scintillation=True,
-        seed=seed
+        seed=seed,
+        r0_total=r0_total
     )
 
 
@@ -58,15 +60,29 @@ def simulate_frame_sequence(
     magnitude: float = 5.0,
     zenith_angle_deg: float = 30.0,
     num_frames: int = 100,
-    seed: Optional[int] = 42
+    seed: Optional[int] = 42,
+    r0_total: Optional[float] = None
 ) -> tuple:
     """
     Simulate a sequence of speckle frames.
     
+    Parameters
+    ----------
+    magnitude : float
+        Stellar magnitude
+    zenith_angle_deg : float
+        Zenith angle in degrees
+    num_frames : int
+        Number of frames to simulate
+    seed : int, optional
+        Random seed
+    r0_total : float, optional
+        Override total r0 at zenith in meters
+    
     Returns
     -------
     tuple
-        (image_cube, fluxes, times, telescope, focal_grid)
+        (image_cube, fluxes, times, telescope, aperture_radius_pix)
     """
     # Setup
     telescope = HaleTelescope(
@@ -84,7 +100,8 @@ def simulate_frame_sequence(
     atmosphere = create_atmosphere_with_scintillation(
         telescope.pupil_grid,
         zenith_angle_deg=zenith_angle_deg,
-        seed=seed
+        seed=seed,
+        r0_total=r0_total
     )
     
     photons_per_frame = photons_per_exposure(magnitude)
@@ -95,6 +112,11 @@ def simulate_frame_sequence(
     pixel_scale_rad = telescope.focal_grid.delta[0]  # radians per pixel
     pixels_per_lambda_D = lambda_over_D / pixel_scale_rad
     aperture_radius_pix = int(3.0 * pixels_per_lambda_D)
+    
+    # Get actual r0 (effective at zenith angle)
+    from config import TOTAL_R0_ZENITH
+    actual_r0_zenith = r0_total if r0_total is not None else TOTAL_R0_ZENITH
+    actual_r0 = zenith_correction(actual_r0_zenith, zenith_angle_deg)
     
     # Get image dimensions
     sample_img = telescope.reference_psf.shaped
@@ -108,6 +130,8 @@ def simulate_frame_sequence(
     print(f"Simulating {num_frames} frames...")
     print(f"  Magnitude: {magnitude}")
     print(f"  Zenith angle: {zenith_angle_deg}°")
+    print(f"  r0 (zenith): {actual_r0_zenith*100:.1f} cm")
+    print(f"  r0 (effective): {actual_r0*100:.1f} cm")
     print(f"  Photons/frame: {photons_per_frame:.2e}")
     
     for i in range(num_frames):
@@ -135,8 +159,14 @@ def save_fits(image_cube: np.ndarray,
               fluxes: np.ndarray,
               magnitude: float,
               zenith_angle_deg: float,
-              output_path: str):
+              output_path: str,
+              r0_zenith: float = None):
     """Save image cube and fluxes to FITS file."""
+    from config import TOTAL_R0_ZENITH
+    
+    # Use provided r0 or default
+    r0_z = r0_zenith if r0_zenith is not None else TOTAL_R0_ZENITH
+    r0_eff = zenith_correction(r0_z, zenith_angle_deg)
     
     # Primary HDU: image cube
     primary_hdu = fits.PrimaryHDU(image_cube.astype(np.float32))
@@ -145,8 +175,9 @@ def save_fits(image_cube: np.ndarray,
     primary_hdu.header['WAVELEN'] = WAVELENGTH
     primary_hdu.header['MAG'] = magnitude
     primary_hdu.header['ZENITH'] = zenith_angle_deg
-    primary_hdu.header['R0'] = zenith_correction(TOTAL_R0_ZENITH, zenith_angle_deg)
-    primary_hdu.header['TELESCOP'] = 'Hale 5.08m'
+    primary_hdu.header['R0_ZEN'] = (r0_z, 'Fried parameter at zenith [m]')
+    primary_hdu.header['R0'] = (r0_eff, 'Effective Fried parameter [m]')
+    primary_hdu.header['TELESCOP'] = 'PlaneWave CDK700'
     primary_hdu.header['BUNIT'] = 'electrons'
     
     # Extension: flux measurements
@@ -244,6 +275,7 @@ def plot_flux_timeseries(fluxes: np.ndarray,
 
 def main():
     import argparse
+    from config import TOTAL_R0_ZENITH
     
     parser = argparse.ArgumentParser(description='Per-frame flux analysis')
     parser.add_argument('-m', '--magnitude', type=float, default=5.0,
@@ -252,12 +284,17 @@ def main():
                         help='Zenith angle in degrees (default: 30)')
     parser.add_argument('-n', '--nframes', type=int, default=100,
                         help='Number of frames (default: 100)')
+    parser.add_argument('-r', '--r0', type=float, default=None,
+                        help=f'Fried parameter r0 at zenith in cm (default: {TOTAL_R0_ZENITH*100:.1f})')
     parser.add_argument('--seed', type=int, default=42,
                         help='Random seed (default: 42)')
     parser.add_argument('-o', '--output', type=str, default='speckle_sequence',
                         help='Output basename (default: speckle_sequence)')
     
     args = parser.parse_args()
+    
+    # Convert r0 from cm to meters if specified
+    r0_meters = args.r0 / 100.0 if args.r0 is not None else None
     
     print("=" * 60)
     print("Per-Frame Flux Analysis")
@@ -268,15 +305,17 @@ def main():
         magnitude=args.magnitude,
         zenith_angle_deg=args.zenith,
         num_frames=args.nframes,
-        seed=args.seed
+        seed=args.seed,
+        r0_total=r0_meters
     )
     
-    # Save FITS
-    fits_path = f"{args.output}_M{args.magnitude:.0f}_z{args.zenith:.0f}.fits"
-    save_fits(image_cube, fluxes, args.magnitude, args.zenith, fits_path)
+    # Build filename with r0 if specified
+    r0_str = f"_r0{args.r0:.0f}" if args.r0 is not None else ""
+    fits_path = f"{args.output}_M{args.magnitude:.0f}_z{args.zenith:.0f}{r0_str}.fits"
+    save_fits(image_cube, fluxes, args.magnitude, args.zenith, fits_path, r0_zenith=r0_meters)
     
     # Plot
-    plot_path = f"{args.output}_M{args.magnitude:.0f}_z{args.zenith:.0f}.png"
+    plot_path = f"{args.output}_M{args.magnitude:.0f}_z{args.zenith:.0f}{r0_str}.png"
     plot_flux_timeseries(fluxes, times, args.magnitude, args.zenith, plot_path)
     
     print("\nDone!")

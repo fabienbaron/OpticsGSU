@@ -1,8 +1,8 @@
 """
-Configuration for Hale Telescope speckle imaging simulation.
+Configuration for PlaneWave CDK700 speckle imaging simulation.
 
 Contains:
-- Hale telescope parameters (5.08m primary with central obscuration)
+- PlaneWave CDK700 telescope parameters (0.7m aperture)
 - Hufnagel-Valley 5/7 atmospheric model for Cn2 profile
 - Stellar magnitude to photon flux conversion
 - Three-layer atmospheric model based on HV-57
@@ -11,12 +11,19 @@ Contains:
 import numpy as np
 
 # =============================================================================
-# Hale Telescope Parameters
+# PlaneWave CDK700 Telescope Parameters
 # =============================================================================
 
-HALE_DIAMETER = 5.08  # meters - primary mirror diameter
-HALE_OBSCURATION_RATIO = 0.36  # central obscuration ratio (secondary/primary)
-# The Hale telescope has a 1.83m secondary, giving ~0.36 ratio
+# CDK700 specifications from PlaneWave
+TELESCOPE_NAME = "PlaneWave CDK700"
+TELESCOPE_DIAMETER = 0.700  # meters - 700mm primary mirror
+TELESCOPE_OBSCURATION_RATIO = 0.42  # central obscuration ratio (42% linear)
+TELESCOPE_FOCAL_LENGTH = 4.540  # meters (4540mm)
+TELESCOPE_FOCAL_RATIO = 6.5  # f/6.5
+
+# Aliases for backward compatibility
+HALE_DIAMETER = TELESCOPE_DIAMETER
+HALE_OBSCURATION_RATIO = TELESCOPE_OBSCURATION_RATIO
 
 # =============================================================================
 # Observational Parameters
@@ -54,8 +61,8 @@ def stellar_flux(magnitude: float) -> float:
 
 
 def photons_per_exposure(magnitude: float, 
-                          diameter: float = HALE_DIAMETER,
-                          obscuration: float = HALE_OBSCURATION_RATIO,
+                          diameter: float = TELESCOPE_DIAMETER,
+                          obscuration: float = TELESCOPE_OBSCURATION_RATIO,
                           exposure: float = EXPOSURE_TIME) -> float:
     """
     Calculate total photons collected per exposure.
@@ -204,12 +211,9 @@ def compute_layer_integrated_cn2(h_low: float, h_high: float) -> float:
 LAYER_BOUNDS = [(0, 500), (500, 2000), (2000, 5000)]
 
 # Compute integrated Cn2 for each layer
-_LAYER_INTEGRATED_CN2_RAW = [compute_layer_integrated_cn2(lo, hi) for lo, hi in LAYER_BOUNDS]
-
-# Scale factor to simulate better seeing conditions
-# To get r0 10x larger (good seeing ~50cm instead of ~5cm), scale Cn2 by 1/10^(5/3)
-SEEING_SCALE_FACTOR = 10**(-5/3)  # ~0.0215
-LAYER_INTEGRATED_CN2 = [cn2 * SEEING_SCALE_FACTOR for cn2 in _LAYER_INTEGRATED_CN2_RAW]
+# Using HV-5/7 profile directly gives r0 ~ 5cm at 500nm zenith
+# For CDK700 (0.7m), this gives D/r0 ~ 14, perfect for speckle imaging
+LAYER_INTEGRATED_CN2 = [compute_layer_integrated_cn2(lo, hi) for lo, hi in LAYER_BOUNDS]
 
 # Wind velocities based on Bufton wind model (typical for HV-5/7)
 # Ground layer: typically slow

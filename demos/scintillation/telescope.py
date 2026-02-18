@@ -1,10 +1,11 @@
 """
-Hale Telescope optical model using HCIpy.
+PlaneWave CDK700 Telescope optical model using HCIpy.
 
-The 200-inch Hale Telescope at Palomar Observatory:
-- 5.08m primary mirror
-- 1.83m central obscuration (secondary)
-- Four-vane spider support structure
+PlaneWave CDK700 specifications:
+- 700mm (0.7m) primary mirror
+- 42% central obscuration (linear)
+- Corrected Dall-Kirkham optical design
+- f/6.5, 4540mm focal length
 """
 
 import numpy as np
@@ -12,13 +13,17 @@ import hcipy as hp
 from typing import Tuple, Optional
 
 from config import (
-    HALE_DIAMETER,
-    HALE_OBSCURATION_RATIO,
+    TELESCOPE_DIAMETER,
+    TELESCOPE_OBSCURATION_RATIO,
+    TELESCOPE_NAME,
     WAVELENGTH
 )
 
+# For backward compatibility
+HALE_DIAMETER = TELESCOPE_DIAMETER
+HALE_OBSCURATION_RATIO = TELESCOPE_OBSCURATION_RATIO
 
-# Spider vane parameters for Hale telescope
+# Spider vane parameters for CDK700 (truss structure, simplified as 4-vane)
 SPIDER_WIDTH = 0.02  # Relative width (fraction of diameter)
 SPIDER_ANGLES = [0, 90, 180, 270]  # Four-vane configuration (degrees)
 
@@ -29,7 +34,7 @@ def create_hale_pupil(
     spider_width: float = SPIDER_WIDTH
 ) -> hp.Field:
     """
-    Create the Hale telescope pupil function.
+    Create the telescope pupil function.
     
     Parameters
     ----------
@@ -46,10 +51,10 @@ def create_hale_pupil(
         Complex pupil function (1 inside, 0 outside)
     """
     # Primary aperture (circular)
-    primary = hp.circular_aperture(HALE_DIAMETER)(pupil_grid)
+    primary = hp.circular_aperture(TELESCOPE_DIAMETER)(pupil_grid)
     
     # Secondary obscuration (central)
-    secondary_diameter = HALE_DIAMETER * HALE_OBSCURATION_RATIO
+    secondary_diameter = TELESCOPE_DIAMETER * TELESCOPE_OBSCURATION_RATIO
     secondary = hp.circular_aperture(secondary_diameter)(pupil_grid)
     
     # Pupil = primary - secondary
@@ -91,7 +96,7 @@ def create_spider_vanes(
     x, y = pupil_grid.coords
     
     # Vane width in meters
-    vane_width = width * HALE_DIAMETER
+    vane_width = width * TELESCOPE_DIAMETER
     
     # Create four vanes at 0, 90, 180, 270 degrees
     for angle in SPIDER_ANGLES:
@@ -132,7 +137,7 @@ def create_pupil_grid(
     hp.Grid
         Cartesian grid for the pupil plane
     """
-    grid_size = HALE_DIAMETER * oversampling
+    grid_size = TELESCOPE_DIAMETER * oversampling
     pupil_grid = hp.make_pupil_grid(num_pixels, grid_size)
     return pupil_grid
 
@@ -167,7 +172,7 @@ def create_focal_grid(
     focal_grid = hp.make_focal_grid(
         q, 
         num_airy,
-        pupil_diameter=HALE_DIAMETER,
+        pupil_diameter=TELESCOPE_DIAMETER,
         reference_wavelength=wavelength,
         focal_length=1.0
     )
@@ -384,7 +389,7 @@ def compute_diffraction_limit(wavelength: float = WAVELENGTH) -> dict:
     dict
         Dictionary with lambda/D, FWHM, first null, etc.
     """
-    lambda_D_rad = wavelength / HALE_DIAMETER
+    lambda_D_rad = wavelength / TELESCOPE_DIAMETER
     lambda_D_arcsec = np.degrees(lambda_D_rad) * 3600
     lambda_D_mas = lambda_D_arcsec * 1000
     
@@ -402,7 +407,8 @@ if __name__ == "__main__":
     print("Hale Telescope Optical Model")
     print("=" * 50)
     
-    print(f"\nPrimary diameter: {HALE_DIAMETER} m")
+    print(f"\nTelescope: {TELESCOPE_NAME}")
+    print(f"Primary diameter: {TELESCOPE_DIAMETER} m")
     print(f"Central obscuration: {HALE_OBSCURATION_RATIO*100:.0f}%")
     print(f"Wavelength: {WAVELENGTH*1e9:.0f} nm")
     

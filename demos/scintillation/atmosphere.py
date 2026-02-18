@@ -26,7 +26,8 @@ def create_frozen_flow_atmosphere(
     wavelength: float = WAVELENGTH,
     outer_scale: float = 25.0,
     scintillation: bool = False,
-    seed: Optional[int] = None
+    seed: Optional[int] = None,
+    r0_total: Optional[float] = None
 ) -> hp.MultiLayerAtmosphere:
     """
     Create a multi-layer atmospheric model with Taylor frozen flow.
@@ -48,6 +49,8 @@ def create_frozen_flow_atmosphere(
         Enable scintillation modeling (Fresnel propagation)
     seed : int, optional
         Random seed for reproducibility
+    r0_total : float, optional
+        Override total r0 at zenith in meters. If None, uses default from config.
     
     Returns
     -------
@@ -60,10 +63,18 @@ def create_frozen_flow_atmosphere(
     # Airmass correction factor
     sec_z = 1.0 / np.cos(np.radians(zenith_angle_deg))
     
+    # If r0_total specified, scale all layer r0 values proportionally
+    if r0_total is not None:
+        # Scale factor: new_r0 / old_r0
+        scale = r0_total / TOTAL_R0_ZENITH
+        layer_r0_zenith = [r0 * scale for r0 in LAYER_R0_ZENITH]
+    else:
+        layer_r0_zenith = LAYER_R0_ZENITH
+    
     layers = []
     
     for i, (height, r0_zenith, v_wind, theta_wind) in enumerate(zip(
-            LAYER_HEIGHTS, LAYER_R0_ZENITH, LAYER_WIND_SPEEDS, LAYER_WIND_DIRECTIONS)):
+            LAYER_HEIGHTS, layer_r0_zenith, LAYER_WIND_SPEEDS, LAYER_WIND_DIRECTIONS)):
         
         # Correct r0 for zenith angle: r0(z) = r0(0) * cos(z)^(3/5)
         r0_layer = zenith_correction(r0_zenith, zenith_angle_deg)
