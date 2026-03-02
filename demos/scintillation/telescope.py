@@ -20,15 +20,15 @@ from config import (
 )
 
 # For backward compatibility
-HALE_DIAMETER = TELESCOPE_DIAMETER
-HALE_OBSCURATION_RATIO = TELESCOPE_OBSCURATION_RATIO
+TELESCOPE_DIAMETER = TELESCOPE_DIAMETER
+TELESCOPE_OBSCURATION_RATIO = TELESCOPE_OBSCURATION_RATIO
 
 # Spider vane parameters for CDK700 (truss structure, simplified as 4-vane)
 SPIDER_WIDTH = 0.02  # Relative width (fraction of diameter)
 SPIDER_ANGLES = [0, 90, 180, 270]  # Four-vane configuration (degrees)
 
 
-def create_hale_pupil(
+def create_pupil(
     pupil_grid: hp.Grid,
     include_spider: bool = True,
     spider_width: float = SPIDER_WIDTH
@@ -234,9 +234,9 @@ def create_wavefront(
     return wf
 
 
-class HaleTelescope:
+class Telescope:
     """
-    Complete Hale telescope optical model.
+    Complete PlaneWave CDK700 optical model.
     
     Combines pupil, propagator, and detector simulation.
     """
@@ -250,7 +250,7 @@ class HaleTelescope:
         include_spider: bool = True
     ):
         """
-        Initialize Hale telescope model.
+        Initialize PlaneWave CDK700 model.
         
         Parameters
         ----------
@@ -275,7 +275,7 @@ class HaleTelescope:
         )
         
         # Create pupil
-        self.pupil = create_hale_pupil(self.pupil_grid, include_spider)
+        self.pupil = create_pupil(self.pupil_grid, include_spider)
         
         # Create propagator
         self.propagator = create_propagator(
@@ -404,12 +404,12 @@ def compute_diffraction_limit(wavelength: float = WAVELENGTH) -> dict:
 
 
 if __name__ == "__main__":
-    print("Hale Telescope Optical Model")
+    print("PlaneWave CDK700 Optical Model")
     print("=" * 50)
     
     print(f"\nTelescope: {TELESCOPE_NAME}")
     print(f"Primary diameter: {TELESCOPE_DIAMETER} m")
-    print(f"Central obscuration: {HALE_OBSCURATION_RATIO*100:.0f}%")
+    print(f"Central obscuration: {TELESCOPE_OBSCURATION_RATIO*100:.0f}%")
     print(f"Wavelength: {WAVELENGTH*1e9:.0f} nm")
     
     limits = compute_diffraction_limit()
@@ -420,7 +420,7 @@ if __name__ == "__main__":
     
     # Test pupil creation
     print("\nCreating telescope model...")
-    tel = HaleTelescope(num_pixels=256)
+    tel = Telescope(num_pixels=256)
     
     # Compute collecting area
     pupil_sum = tel.pupil.sum() * tel.pupil_grid.delta[0]**2

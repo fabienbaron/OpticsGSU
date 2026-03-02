@@ -7,8 +7,8 @@ N = pupil_support_size(D, pixscale_wanted) # pick size ensuring minimum sampling
 pixscale = D/(N/2) 
 
 # min and max observing wavelengths [m]
-λmin=400.0e-9
-λmax=1000.0e-9
+λmin=600.0e-9
+λmax=600.0e-9
 resolution = 0.25*λmin/D*1e6/2.0 # assuming Nyquist sampling of pupil at 400 nm
 println("Nyquist pixel scale = ", resolution," [arcsec]")
 
@@ -18,7 +18,7 @@ println("Nyquist pixel scale = ", resolution," [arcsec]")
 nframes = 1000 # Number of frames
 exptime = 5e-3; # exposure time for each frame
 timestamps = (0:nframes-1)*exptime 
-detector = Detector(true, true, UInt16, 1.0, 1.0, 2^16-1, 2.0, exptime)
+detector = Detector(true, false, UInt16, 1.0, 1.0, 2^16-1, 2.0, exptime)
 #poisson::Bool, adu::Bool, aduTYPE::DataType, qe::Array{Float32,1}, gain::Float32, saturation::Int32,σ_ron::Float32, exptime::Float32 
 
 #
@@ -65,7 +65,7 @@ savefile= "speckle_sat_n"*string(N)*"_nframes"*string(nframes)*"_nλ"*string(len
 println("Saving file as: $savefile")
 jldsave(savefile; λ,  timestamps, I, aperture_mask, data, psfs, otfs, pupil_amps, pupil_phases, detector, object, FTobject, atmosphere)
 
-writefits(psfs "psfs.fits")
+writefits(psfs, "psfs.fits")
 writefits(data, "data.fits")
 
 

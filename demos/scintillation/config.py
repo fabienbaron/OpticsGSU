@@ -22,8 +22,8 @@ TELESCOPE_FOCAL_LENGTH = 4.540  # meters (4540mm)
 TELESCOPE_FOCAL_RATIO = 6.5  # f/6.5
 
 # Aliases for backward compatibility
-HALE_DIAMETER = TELESCOPE_DIAMETER
-HALE_OBSCURATION_RATIO = TELESCOPE_OBSCURATION_RATIO
+TELESCOPE_DIAMETER = TELESCOPE_DIAMETER
+TELESCOPE_OBSCURATION_RATIO = TELESCOPE_OBSCURATION_RATIO
 
 # =============================================================================
 # Observational Parameters
@@ -314,12 +314,12 @@ TOTAL_R0_ZENITH = compute_total_r0()
 # Print configuration summary
 if __name__ == "__main__":
     print("=" * 60)
-    print("Hale Telescope Speckle Imaging Configuration")
+    print("PlaneWave CDK700 Speckle Imaging Configuration")
     print("=" * 60)
     print(f"\nTelescope:")
-    print(f"  Diameter: {HALE_DIAMETER} m")
-    print(f"  Obscuration ratio: {HALE_OBSCURATION_RATIO}")
-    print(f"  Collecting area: {np.pi * (HALE_DIAMETER/2)**2 * (1 - HALE_OBSCURATION_RATIO**2):.2f} m^2")
+    print(f"  Diameter: {TELESCOPE_DIAMETER} m")
+    print(f"  Obscuration ratio: {TELESCOPE_OBSCURATION_RATIO}")
+    print(f"  Collecting area: {np.pi * (TELESCOPE_DIAMETER/2)**2 * (1 - TELESCOPE_OBSCURATION_RATIO**2):.2f} m^2")
     
     print(f"\nObservation:")
     print(f"  Wavelength: {WAVELENGTH*1e9:.0f} nm")

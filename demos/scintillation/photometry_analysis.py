@@ -5,7 +5,7 @@ Simulates speckle imaging photometry:
 - 100-frame stacks averaged to get flux estimate
 - Scintillation modeled by HCIpy (scintillation=True)
 - Simple circular aperture photometry
-- 20 realizations per magnitude to measure scatter
+- 5 realizations per magnitude to measure scatter
 """
 
 import numpy as np
@@ -18,18 +18,13 @@ from tqdm import tqdm
 from config import (
     WAVELENGTH,
     EXPOSURE_TIME,
-    HALE_DIAMETER,
+    TELESCOPE_DIAMETER,
     TOTAL_R0_ZENITH,
     photons_per_exposure,
     zenith_correction
 )
-from atmosphere import (
-    LAYER_HEIGHTS,
-    LAYER_R0_ZENITH,
-    LAYER_WIND_SPEEDS,
-    LAYER_WIND_DIRECTIONS,
-)
-from telescope import HaleTelescope, create_wavefront
+from atmosphere import create_frozen_flow_atmosphere
+from telescope import Telescope, create_wavefront
 from camera import SpeckleCamera
 
 
@@ -51,34 +46,13 @@ def create_atmosphere_with_scintillation(
     """
     Create three-layer atmosphere with scintillation enabled.
     """
-    if seed is not None:
-        np.random.seed(seed)
-    
-    sec_z = 1.0 / np.cos(np.radians(zenith_angle_deg))
-    layers = []
-    
-    for height, r0_zenith, v_wind, theta_wind in zip(
-            LAYER_HEIGHTS, LAYER_R0_ZENITH, LAYER_WIND_SPEEDS, LAYER_WIND_DIRECTIONS):
-        
-        r0 = zenith_correction(r0_zenith, zenith_angle_deg)
-        velocity = v_wind * np.array([np.cos(theta_wind), np.sin(theta_wind)])
-        eff_height = height * sec_z
-        
-        layer = hp.InfiniteAtmosphericLayer(
-            pupil_grid,
-            Cn_squared=1.0,
-            L0=outer_scale,
-            velocity=velocity,
-            height=eff_height,
-            use_interpolation=True
-        )
-        
-        k = 2 * np.pi / WAVELENGTH
-        layer.Cn_squared = r0**(-5/3) / (0.423 * k**2)
-        layers.append(layer)
-    
-    # Scintillation ON
-    return hp.MultiLayerAtmosphere(layers, scintillation=True)
+    return create_frozen_flow_atmosphere(
+        pupil_grid,
+        zenith_angle_deg=zenith_angle_deg,
+        outer_scale=outer_scale,
+        scintillation=True,
+        seed=seed
+    )
 
 
 def aperture_photometry(image: hp.Field, aperture_radius_pix: int) -> float:
@@ -99,7 +73,7 @@ def aperture_photometry(image: hp.Field, aperture_radius_pix: int) -> float:
 
 
 def measure_photometry_single_realization(
-    telescope: HaleTelescope,
+    telescope: Telescope,
     camera: SpeckleCamera,
     zenith_angle_deg: float,
     magnitude: float,
@@ -146,14 +120,14 @@ def run_magnitude_sweep(
     magnitudes: List[float],
     zenith_angle_deg: float = 30.0,
     num_frames: int = 100,
-    num_realizations: int = 20,
+    num_realizations: int = 5,
     base_seed: int = 42
 ) -> List[PhotometryResult]:
     """
     Run photometry analysis across magnitudes.
     """
     # Setup telescope and camera once
-    telescope = HaleTelescope(
+    telescope = Telescope(
         num_pixels=256,
         wavelength=WAVELENGTH,
         focal_sampling=4,
@@ -167,7 +141,7 @@ def run_magnitude_sweep(
     
     # Aperture radius: 3 lambda/D
     # With physical units: focal_grid.delta is in radians
-    lambda_over_D = WAVELENGTH / HALE_DIAMETER  # radians
+    lambda_over_D = WAVELENGTH / TELESCOPE_DIAMETER  # radians
     pixel_scale_rad = telescope.focal_grid.delta[0]  # radians per pixel
     pixels_per_lambda_D = lambda_over_D / pixel_scale_rad
     aperture_radius_pix = int(3.0 * pixels_per_lambda_D)
@@ -225,13 +199,13 @@ def plot_results(results: List[PhotometryResult], output_path: str = None):
     ax.set_xlabel('Magnitude', fontsize=14)
     ax.set_ylabel('Photometric Error (%)', fontsize=14)
     ax.set_title('Photometric Accuracy vs Magnitude\n'
-                 '(100-frame stack, 20 realizations, scintillation ON)', fontsize=14)
+                 '(100-frame stack, 5 realizations, scintillation ON)', fontsize=14)
     ax.grid(True, alpha=0.3, which='both')
     ax.legend(loc='upper left')
     
     # Info box
     r0 = zenith_correction(TOTAL_R0_ZENITH, 30.0)
-    info = (f"Hale 5.08m, λ=500nm\n"
+    info = (f"PlaneWave CDK700, λ=500nm\n"
             f"z=30°, r₀={r0*100:.1f}cm\n"
             f"Exposure=5ms")
     ax.text(0.97, 0.03, info, transform=ax.transAxes, fontsize=10,
@@ -248,18 +222,45 @@ def plot_results(results: List[PhotometryResult], output_path: str = None):
 
 
 def main():
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Photometric accuracy vs magnitude analysis')
+    parser.add_argument('--mag-min', type=float, default=0,
+                        help='Minimum magnitude (default: 0)')
+    parser.add_argument('--mag-max', type=float, default=12,
+                        help='Maximum magnitude (default: 12)')
+    parser.add_argument('--mag-step', type=float, default=2,
+                        help='Magnitude step (default: 2)')
+    parser.add_argument('-z', '--zenith', type=float, default=30.0,
+                        help='Zenith angle in degrees (default: 30)')
+    parser.add_argument('-n', '--nframes', type=int, default=100,
+                        help='Frames per stack (default: 100)')
+    parser.add_argument('-r', '--realizations', type=int, default=5,
+                        help='Realizations per magnitude (default: 5)')
+    parser.add_argument('--seed', type=int, default=42,
+                        help='Base random seed (default: 42)')
+    parser.add_argument('-o', '--output', type=str, default='photometric_accuracy.png',
+                        help='Output plot filename (default: photometric_accuracy.png)')
+    
+    args = parser.parse_args()
+    
+    # Generate magnitude list
+    magnitudes = []
+    mag = args.mag_min
+    while mag <= args.mag_max:
+        magnitudes.append(mag)
+        mag += args.mag_step
+    
     print("=" * 60)
     print("Photometric Accuracy vs Magnitude")
     print("=" * 60)
     
-    magnitudes = [0, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    
     results = run_magnitude_sweep(
         magnitudes=magnitudes,
-        zenith_angle_deg=30.0,
-        num_frames=100,
-        num_realizations=20,
-        base_seed=42
+        zenith_angle_deg=args.zenith,
+        num_frames=args.nframes,
+        num_realizations=args.realizations,
+        base_seed=args.seed
     )
     
     print("\n" + "=" * 60)
@@ -268,7 +269,7 @@ def main():
     for r in results:
         print(f"{r.magnitude:>5.1f} {r.flux_mean:>12.2e} {r.flux_std:>12.2e} {r.error_percent:>10.3f}")
     
-    plot_results(results, output_path='photometric_accuracy.png')
+    plot_results(results, output_path=args.output)
 
 
 if __name__ == "__main__":

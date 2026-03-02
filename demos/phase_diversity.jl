@@ -85,9 +85,7 @@ function likelihood_and_prior(x)
   return f_o(x) + 5e-7*tv(x)
 end
 
-
 x = vmlmb(likelihood_and_prior, rand(N,N), lower=0, maxiter=300, autodiff=true, verb=true)
-
 
 function f_ϕ(ϕ)
     pupil1 = amplitude.*exp.(im*ϕ)

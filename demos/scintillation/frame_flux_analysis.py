@@ -15,13 +15,13 @@ from typing import Optional
 from config import (
     WAVELENGTH,
     EXPOSURE_TIME,
-    HALE_DIAMETER,
+    TELESCOPE_DIAMETER,
     TOTAL_R0_ZENITH,
     photons_per_exposure,
     zenith_correction
 )
 from atmosphere import create_frozen_flow_atmosphere
-from telescope import HaleTelescope, create_wavefront
+from telescope import Telescope, create_wavefront
 from camera import SpeckleCamera
 
 
@@ -85,7 +85,7 @@ def simulate_frame_sequence(
         (image_cube, fluxes, times, telescope, aperture_radius_pix)
     """
     # Setup
-    telescope = HaleTelescope(
+    telescope = Telescope(
         num_pixels=256,
         wavelength=WAVELENGTH,
         focal_sampling=4,
@@ -108,7 +108,7 @@ def simulate_frame_sequence(
     
     # Aperture: 3 lambda/D
     # With physical units: focal_grid.delta is in radians
-    lambda_over_D = WAVELENGTH / HALE_DIAMETER  # radians
+    lambda_over_D = WAVELENGTH / TELESCOPE_DIAMETER  # radians
     pixel_scale_rad = telescope.focal_grid.delta[0]  # radians per pixel
     pixels_per_lambda_D = lambda_over_D / pixel_scale_rad
     aperture_radius_pix = int(3.0 * pixels_per_lambda_D)
